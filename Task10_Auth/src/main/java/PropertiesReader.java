@@ -3,11 +3,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
-public class LoadProperties {
-    private Properties p = new Properties();
-    private FileReader reader;
+public class PropertiesReader {
+    private static FileReader reader;
 
-    public Properties loadProperties() {
+    private static Properties loadProperties() {
+        Properties p = new Properties();
         {
             try {
                 reader = new FileReader("src/main/resources/config.properties");
@@ -24,5 +24,9 @@ public class LoadProperties {
             }
         }
         return p;
+    }
+
+    public static String get(String key) {
+        return loadProperties().getProperty(key);
     }
 }

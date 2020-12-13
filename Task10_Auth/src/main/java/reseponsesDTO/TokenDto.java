@@ -1,33 +1,39 @@
 package reseponsesDTO;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class TokenDto {
-    private String access_token;
-    private String token_type;
-    private int expires_in;
+    @JsonProperty("access_token")
+    private String accessToken;
+    @JsonProperty("token_type")
+    private String tokenType;
+    @JsonProperty("expires_in")
+    private int expiresIn;
+    @JsonProperty
     private String scope;
 
-    public String getAccess_token() {
-        return access_token;
+    public String getAccessToken() {
+        return accessToken;
     }
 
-    public void setAccess_token(String access_token) {
-        this.access_token = access_token;
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
-    public String getToken_type() {
-        return token_type;
+    public String getTokenType() {
+        return tokenType;
     }
 
-    public void setToken_type(String token_type) {
-        this.token_type = token_type;
+    public void setTokenType(String tokenType) {
+        this.tokenType = tokenType;
     }
 
-    public int getExpires_in() {
-        return expires_in;
+    public int getExpiresIn() {
+        return expiresIn;
     }
 
-    public void setExpires_in(int expires_in) {
-        this.expires_in = expires_in;
+    public void setExpiresIn(int expiresIn) {
+        this.expiresIn = expiresIn;
     }
 
     public String getScope() {

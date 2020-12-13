@@ -2,49 +2,45 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import reseponsesDTO.TokenDto;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Properties;
 
 public class AuthSingleton {
     private static AuthSingleton object;
-    private static String writeToken;
-    private static String readToken;
-    private Properties properties = new LoadProperties().loadProperties();
+    private static TokenDto tokenDto;
+    private TokenDto writeToken;
+    private TokenDto readToken;
 
     private AuthSingleton() {
-        readToken = getToken(properties.getProperty("readAccess"));
-        writeToken = getToken(properties.getProperty("writeAccess"));
+        readToken = getToken(PropertiesReader.get("readAccess"));
+        writeToken = getToken(PropertiesReader.get("writeAccess"));
     }
 
     public static AuthSingleton getInstance() {
         if (object == null) {
             object = new AuthSingleton();
         }
-
         return object;
     }
 
     public String getReadToken() {
-        return "Bearer " + readToken;
+        return "Bearer " + readToken.getAccessToken();
     }
 
 
     public String getWriteToken() {
-        return "Bearer " + writeToken;
+        return "Bearer " + writeToken.getAccessToken();
     }
 
-    private String getToken(String accessType) {
-        HttpPost httpPost = new HttpPost(properties.getProperty("tokenURI"));
+    private static TokenDto getToken(String accessType) {
+        HttpPost httpPost = new HttpPost(PropertiesReader.get("tokenURI"));
         ArrayList<BasicNameValuePair> tokenConfig = new ArrayList<>();
         tokenConfig.add(new BasicNameValuePair("grant_type", "client_credentials"));
         tokenConfig.add(new BasicNameValuePair("scope", accessType));
 
-        String token = null;
         try {
             httpPost.setEntity(new UrlEncodedFormEntity(tokenConfig));
         } catch (UnsupportedEncodingException e) {
@@ -53,10 +49,7 @@ public class AuthSingleton {
         CloseableHttpResponse response = null;
         try {
             response = HttpClientSingleton.getInstance().getHttpClientWithProvider().execute(httpPost);
-            String tokenResposeString = EntityUtils.toString(response.getEntity(), "UTF-8");
-            Mapper mapper = new Mapper();
-            TokenDto tokenDto = mapper.tokenStringToObject(tokenResposeString);
-            token = tokenDto.getAccess_token();
+            tokenDto = Mapper.entityToObj(response.getEntity(), TokenDto.class);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -67,7 +60,7 @@ public class AuthSingleton {
                 e.printStackTrace();
             }
         }
-        return token;
+        return tokenDto;
     }
 }
 

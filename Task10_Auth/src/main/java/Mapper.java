@@ -1,20 +1,23 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import reseponsesDTO.TokenDto;
+import org.apache.http.HttpEntity;
+import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
 
 public class Mapper {
-    private TokenDto tokenDto = new TokenDto();
-    private ObjectMapper objectMapper = new ObjectMapper();
-
-
-    public TokenDto tokenStringToObject(String response ) {
+    public static <T> T entityToObj(HttpEntity entity, Class<T> clazz) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String body;
         try {
-
-            tokenDto = objectMapper.readValue(response, TokenDto.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            body = EntityUtils.toString(entity, "UTF-8");
+        } catch (IOException e) {
+            throw new RuntimeException("Can't transform http entity to string");
         }
-        return tokenDto;
-
+        try {
+            return objectMapper.readValue(body, clazz);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Can't map to the object of " + clazz.getName());
+        }
     }
 }
