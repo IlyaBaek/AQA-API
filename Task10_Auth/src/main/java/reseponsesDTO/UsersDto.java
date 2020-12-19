@@ -5,17 +5,17 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class UsersDto {
     private int age;
     private String name;
-    public enum sex{FEMALE,MALE}
     private String zipCode;
     @JsonProperty("sex")
     public sex userSex;
 
+    public enum sex {FEMALE, MALE}
 
     public void setUserSex(sex input) {
         userSex = input;
     }
 
-    public sex getUserSex(){
+    public sex getUserSex() {
         return userSex;
     }
 

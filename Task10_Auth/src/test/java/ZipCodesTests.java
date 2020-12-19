@@ -1,14 +1,9 @@
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -16,101 +11,60 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ZipCodesTests {
     @Test
     public void getZipCodesTest() {
-        CloseableHttpResponse response = getZipCodes();
-        ArrayList<String> getZipCodesResponseBody = responseStringToArrayList(response);
+        ZipCodesClient zipCodesClient = new ZipCodesClient();
+        ResponseWrapper responseWrapper = zipCodesClient.getZipCodes();
+        List<String> getZipCodesResponseBody = new ArrayList<>(responseWrapper.getResponseBody());
 
         assertAll("Response has body and status code is 200",
-                () -> assertEquals(200, response.getStatusLine().getStatusCode(),
+                () -> assertEquals(200, responseWrapper.getResponseCode(),
                         "Bug: GET request should return 200"),
                 () -> assertNotNull(getZipCodesResponseBody, "Response has body"));
-
     }
 
     @Test
-    public void scenario2Test() {
-        CloseableHttpResponse getResponse = getZipCodes();
-        ArrayList<String> availableZipCodes = responseStringToArrayList(getResponse);
+    public void addZipCodesTest() {
+        ZipCodesClient zipCodesClient = new ZipCodesClient();
+        ResponseWrapper responseGet = zipCodesClient.getZipCodes();
+        List<String> availableZipCodes = new ArrayList<>(responseGet.getResponseBody());
 
-        ArrayList<String> newZipCodes = new ArrayList<>();
-        newZipCodes.add("99999");
-        newZipCodes.add("88888");
+        List<String> newZipCodes = new ArrayList<>();
+        newZipCodes.add(RandomStringUtils.random(5, false, true));
+        newZipCodes.add(RandomStringUtils.random(5, false, true));
 
-        ArrayList<String> expectedZipCodesAfterPost = new ArrayList<>();
+        List<String> expectedZipCodesAfterPost = new ArrayList<>();
         expectedZipCodesAfterPost.addAll(availableZipCodes);
         expectedZipCodesAfterPost.addAll(newZipCodes);
 
-        CloseableHttpResponse postResponse = postZipCodes(newZipCodes);
-        ArrayList<String> resultZipCodes = responseStringToArrayList(postResponse);
+        ResponseWrapper responsePost = zipCodesClient.postZipCodes(newZipCodes);
+        List<String> resultZipCodes = responsePost.getResponseBody();
+
         assertAll("Status code is 201 and Zip codes from request body are added to available zip codes",
                 () -> assertEquals(expectedZipCodesAfterPost, resultZipCodes),
-                () -> assertEquals(201, postResponse.getStatusLine().getStatusCode()));
+                () -> assertEquals(201, responsePost.getResponseCode()));
     }
 
     @Test
-    public void scenario3Test() {
-        CloseableHttpResponse getResponse = getZipCodes();
-        ArrayList<String> availableZipCodes = responseStringToArrayList(getResponse);
+    public void addDuplicatesZipCodesAndCheckThereAreNoDuplicationsTest() {
+        ZipCodesClient zipCodesClient = new ZipCodesClient();
+        ResponseWrapper responseGet = zipCodesClient.getZipCodes();
+        List<String> availableZipCodes = responseGet.getResponseBody();
 
         Random random = new Random();
-        ArrayList<String> newZipCodes = new ArrayList<>();
+        List<String> newZipCodes = new ArrayList<>();
         newZipCodes.add(availableZipCodes.get(random.nextInt(availableZipCodes.size())));
         newZipCodes.add(availableZipCodes.get(random.nextInt(availableZipCodes.size())));
 
-        ArrayList<String> expectedZipCodesAfterPost = new ArrayList<>();
+        List<String> expectedZipCodesAfterPost = new ArrayList<>();
         expectedZipCodesAfterPost.addAll(availableZipCodes);
         expectedZipCodesAfterPost.addAll(newZipCodes);
 
-        CloseableHttpResponse postResponse = postZipCodes(newZipCodes);
-        ArrayList<String> resultZipCodes = responseStringToArrayList(postResponse);
-
-        HashSet<String> resultZipCodesWithoutDuplications = new HashSet<>(resultZipCodes);
+        ResponseWrapper responsePost = zipCodesClient.postZipCodes(newZipCodes);
+        List<String> resultZipCodes = responsePost.getResponseBody();
+        List<String> resultZipCodesWithoutDuplications = new ArrayList<>(new HashSet<>(resultZipCodes));
 
         assertAll("Status code is 201 // Zip codes from request body are added to available zip codes //  There are no duplications in available zip codes",
                 () -> assertEquals(expectedZipCodesAfterPost, resultZipCodes),
                 () -> assertEquals(resultZipCodesWithoutDuplications, resultZipCodes),
-                () -> assertEquals(201, postResponse.getStatusLine().getStatusCode()));
-    }
-
-    private CloseableHttpResponse getZipCodes() {
-        HttpGet httpGet = new HttpGet(PropertiesReader.get("zipCodesURI"));
-        httpGet.addHeader("Authorization", AuthSingleton.getInstance().getReadToken());
-        CloseableHttpResponse response = null;
-        try {
-            response = HttpClientSingleton.getInstance().getHttpClient().execute(httpGet);
-            //response.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return response;
-    }
-
-    private CloseableHttpResponse postZipCodes(ArrayList<String> body) {
-        HttpPost httpPost = new HttpPost(PropertiesReader.get("zipCodesExpandURI"));
-        httpPost.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
-        CloseableHttpResponse response = null;
-        try {
-            StringEntity entity = new StringEntity(body.toString());
-            httpPost.setEntity(entity);
-            httpPost.setHeader("Accept", "*/*");
-            httpPost.setHeader("Content-type", "application/json");
-
-            response = HttpClientSingleton.getInstance().getHttpClient().execute(httpPost);
-            //response.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return response;
-    }
-
-    private ArrayList<String> responseStringToArrayList(CloseableHttpResponse response) {
-        ArrayList<String> arrayList = new ArrayList<>();
-        try {
-            arrayList = new ArrayList<>(Arrays.asList(new BasicResponseHandler().handleResponse(response).replaceAll("[\\[\\]\"]", "").split(",")));
-            response.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return arrayList;
+                () -> assertEquals(201, responsePost.getResponseCode()));
     }
 }

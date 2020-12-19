@@ -18,7 +18,7 @@ public class UsersTests {
     }
 
     public CloseableHttpResponse createUser() {
-        HttpPost httpPost = new HttpPost(PropertiesReader.get("usersURI"));
+        HttpPost httpPost = new HttpPost(PropertiesReader.get("appURI")+PropertiesReader.get("usersURI"));
         httpPost.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
         CloseableHttpResponse response = null;
         try {
