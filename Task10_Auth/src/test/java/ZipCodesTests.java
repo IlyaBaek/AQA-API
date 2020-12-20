@@ -9,9 +9,9 @@ import java.util.Random;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ZipCodesTests {
+    private ZipCodesClient zipCodesClient = new ZipCodesClient();
     @Test
     public void getZipCodesTest() {
-        ZipCodesClient zipCodesClient = new ZipCodesClient();
         ResponseWrapper responseWrapper = zipCodesClient.getZipCodes();
         List<String> getZipCodesResponseBody = new ArrayList<>(responseWrapper.getResponseBody());
 
@@ -23,7 +23,6 @@ public class ZipCodesTests {
 
     @Test
     public void addZipCodesTest() {
-        ZipCodesClient zipCodesClient = new ZipCodesClient();
         ResponseWrapper responseGet = zipCodesClient.getZipCodes();
         List<String> availableZipCodes = new ArrayList<>(responseGet.getResponseBody());
 
@@ -45,7 +44,6 @@ public class ZipCodesTests {
 
     @Test
     public void addDuplicatesZipCodesAndCheckThereAreNoDuplicationsTest() {
-        ZipCodesClient zipCodesClient = new ZipCodesClient();
         ResponseWrapper responseGet = zipCodesClient.getZipCodes();
         List<String> availableZipCodes = responseGet.getResponseBody();
 
