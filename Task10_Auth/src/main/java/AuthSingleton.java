@@ -36,7 +36,7 @@ public class AuthSingleton {
     }
 
     private static TokenDto getToken(String accessType) {
-        HttpPost httpPost = new HttpPost(PropertiesReader.get("tokenURI"));
+        HttpPost httpPost = new HttpPost(PropertiesReader.get("appURI")+PropertiesReader.get("tokenURI"));
         ArrayList<BasicNameValuePair> tokenConfig = new ArrayList<>();
         tokenConfig.add(new BasicNameValuePair("grant_type", "client_credentials"));
         tokenConfig.add(new BasicNameValuePair("scope", accessType));
