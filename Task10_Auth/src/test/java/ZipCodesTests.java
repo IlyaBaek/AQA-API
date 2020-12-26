@@ -13,7 +13,9 @@ public class ZipCodesTests {
     @Test
     public void getZipCodesTest() {
         ResponseWrapper responseWrapper = zipCodesClient.getZipCodes();
-        List<String> getZipCodesResponseBody = new ArrayList<>(responseWrapper.getResponseBody());
+        List<String> getZipCodesResponseBody = new ArrayList<>(responseWrapper.getResponseBodyZipCodes());
+
+        System.out.println(getZipCodesResponseBody);
 
         assertAll("Response has body and status code is 200",
                 () -> assertEquals(200, responseWrapper.getResponseCode(),
@@ -24,7 +26,7 @@ public class ZipCodesTests {
     @Test
     public void addZipCodesTest() {
         ResponseWrapper responseGet = zipCodesClient.getZipCodes();
-        List<String> availableZipCodes = new ArrayList<>(responseGet.getResponseBody());
+        List<String> availableZipCodes = new ArrayList<>(responseGet.getResponseBodyZipCodes());
 
         List<String> newZipCodes = new ArrayList<>();
         newZipCodes.add(RandomStringUtils.random(5, false, true));
@@ -35,7 +37,7 @@ public class ZipCodesTests {
         expectedZipCodesAfterPost.addAll(newZipCodes);
 
         ResponseWrapper responsePost = zipCodesClient.postZipCodes(newZipCodes);
-        List<String> resultZipCodes = responsePost.getResponseBody();
+        List<String> resultZipCodes = responsePost.getResponseBodyZipCodes();
 
         assertAll("Status code is 201 and Zip codes from request body are added to available zip codes",
                 () -> assertEquals(expectedZipCodesAfterPost, resultZipCodes),
@@ -45,7 +47,7 @@ public class ZipCodesTests {
     @Test
     public void addDuplicatesZipCodesAndCheckThereAreNoDuplicationsTest() {
         ResponseWrapper responseGet = zipCodesClient.getZipCodes();
-        List<String> availableZipCodes = responseGet.getResponseBody();
+        List<String> availableZipCodes = responseGet.getResponseBodyZipCodes();
 
         Random random = new Random();
         List<String> newZipCodes = new ArrayList<>();
@@ -57,7 +59,7 @@ public class ZipCodesTests {
         expectedZipCodesAfterPost.addAll(newZipCodes);
 
         ResponseWrapper responsePost = zipCodesClient.postZipCodes(newZipCodes);
-        List<String> resultZipCodes = responsePost.getResponseBody();
+        List<String> resultZipCodes = responsePost.getResponseBodyZipCodes();
         List<String> resultZipCodesWithoutDuplications = new ArrayList<>(new HashSet<>(resultZipCodes));
 
         assertAll("Status code is 201 // Zip codes from request body are added to available zip codes //  There are no duplications in available zip codes",

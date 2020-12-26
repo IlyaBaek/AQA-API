@@ -19,7 +19,7 @@ public class ZipCodesClient {
             response = HttpClientSingleton.getInstance().getHttpClient().execute(httpGet);
 
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
-            responseWrapper.setResponseBody(Stream.of(Mapper.entityToObj(response.getEntity(), String[].class)).collect(Collectors.toCollection(ArrayList::new)));
+            responseWrapper.setResponseBodyZipCodes(Stream.of(Mapper.entityToObj(response.getEntity(), String[].class)).collect(Collectors.toCollection(ArrayList::new)));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -46,7 +46,7 @@ public class ZipCodesClient {
 
             response = HttpClientSingleton.getInstance().getHttpClient().execute(httpPost);
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
-            responseWrapper.setResponseBody(Stream.of(Mapper.entityToObj(response.getEntity(), String[].class)).collect(Collectors.toCollection(ArrayList::new)));
+            responseWrapper.setResponseBodyZipCodes(Stream.of(Mapper.entityToObj(response.getEntity(), String[].class)).collect(Collectors.toCollection(ArrayList::new)));
         } catch (IOException e) {
             e.printStackTrace();
         }
