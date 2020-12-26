@@ -32,7 +32,7 @@ public class CreateUsersTests {
         ResponseWrapper getZipCodesResponseAfterCreation = zipCodesClient.getZipCodes();
         int exactZipCodesCountAfterCreation = Collections.frequency(getZipCodesResponseAfterCreation.getResponseBodyZipCodes(), exactZipCode);
         UsersDto addedUser = new UsersDto();
-        ResponseWrapper getUsersResponse = usersClient.getUsers();
+        ResponseWrapper getUsersResponse = usersClient.getUsers(null, null, null);
         ArrayList<UsersDto> usersList = getUsersResponse.getResponseBodyUsers();
         if (usersList.contains(userToAdd)) {
             addedUser = usersList.get(usersList.indexOf(userToAdd));
@@ -55,7 +55,7 @@ public class CreateUsersTests {
 
         ResponseWrapper createUserResponse = usersClient.createUser(userToAdd);
 
-        ResponseWrapper getUsersResponse = usersClient.getUsers();
+        ResponseWrapper getUsersResponse = usersClient.getUsers(null, null, null);
         ArrayList<UsersDto> usersList = getUsersResponse.getResponseBodyUsers();
         UsersDto addedUser = new UsersDto();
         if (usersList.contains(userToAdd)) {
@@ -83,7 +83,7 @@ public class CreateUsersTests {
 
         ResponseWrapper createUserResponse = usersClient.createUser(userToAdd);
 
-        ResponseWrapper getUsersResponse = usersClient.getUsers();
+        ResponseWrapper getUsersResponse = usersClient.getUsers(null, null, null);
         ArrayList<UsersDto> usersList = getUsersResponse.getResponseBodyUsers();
         UsersDto finalUserToAdd = userToAdd;
         assertAll("Status code is 424 // user is NOT added",
@@ -93,13 +93,13 @@ public class CreateUsersTests {
 
     @Test
     public void createUserWithDuplicateNameAndSexTest() {
-        ResponseWrapper getUsersBeforeAddingDuplicateResponse = usersClient.getUsers();
+        ResponseWrapper getUsersBeforeAddingDuplicateResponse = usersClient.getUsers(null, null, null);
         ArrayList<UsersDto> usersListBeforeAddingDuplicate = getUsersBeforeAddingDuplicateResponse.getResponseBodyUsers();
         UsersDto userWithDuplicateNameAndSex = usersListBeforeAddingDuplicate.get(random.nextInt(usersListBeforeAddingDuplicate.size()));
 
         ResponseWrapper createUserResponse = usersClient.createUser(userWithDuplicateNameAndSex);
 
-        ResponseWrapper getUsersResponseAfterAddingDuplicate = usersClient.getUsers();
+        ResponseWrapper getUsersResponseAfterAddingDuplicate = usersClient.getUsers(null, null, null);
         ArrayList<UsersDto> usersListAfterAddingDuplicate = getUsersResponseAfterAddingDuplicate.getResponseBodyUsers();
         assertAll("Status code is 400 // user is NOT added",
                 () -> assertEquals(usersListBeforeAddingDuplicate, usersListAfterAddingDuplicate),
