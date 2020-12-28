@@ -7,6 +7,7 @@ import reseponsesDTO.UsersDto;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,7 +52,7 @@ public class UsersClient {
             response = HttpClientSingleton.getInstance().getHttpClient().execute(httpGet);
 
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
-            responseWrapper.setResponseBodyUsers(Stream.of(Mapper.entityToObj(response.getEntity(), UsersDto[].class)).collect(Collectors.toCollection(ArrayList::new)));
+            responseWrapper.setResponseBody(Stream.of(Mapper.entityToObj(response.getEntity(), UsersDto[].class)).collect(Collectors.toCollection(ArrayList::new)));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -63,5 +64,16 @@ public class UsersClient {
             }
         }
         return responseWrapper;
+    }
+
+    public static void createUserIfNotExist(UsersClient usersClient) {
+        ZipCodesClient zipCodesClient = new ZipCodesClient();
+        ZipCodesClient.createZipCodeIfNotExist(zipCodesClient);
+        ResponseWrapper responseWrapper = usersClient.getUsers();
+        List<UsersDto> usersDtoList = new ArrayList<>(responseWrapper.getResponseBody());
+        if (usersDtoList.isEmpty()) {
+            UsersDto usersDto = new UsersDto();
+            usersClient.createUser(usersDto);
+        }
     }
 }

@@ -1,12 +1,12 @@
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.RandomUtils;
 import org.junit.jupiter.api.Test;
 import reseponsesDTO.UsersDto;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static reseponsesDTO.UsersDto.randomSex;
 
 public class CreateUsersTests {
     private ZipCodesClient zipCodesClient = new ZipCodesClient();
@@ -15,94 +15,92 @@ public class CreateUsersTests {
 
     @Test
     public void createUserTest() {
+        ZipCodesClient.createZipCodeIfNotExist(zipCodesClient);
         ResponseWrapper getZipCodesResponseBeforeCreation = zipCodesClient.getZipCodes();
-        int age = RandomUtils.nextInt(1, 99);
-        String name = RandomStringUtils.random(5, true, false);
-        UsersDto.sex userSex = randomSex();
-        int zipCodesSize = getZipCodesResponseBeforeCreation.getResponseBodyZipCodes().size();
-        String exactZipCode = getZipCodesResponseBeforeCreation.getResponseBodyZipCodes().get(random.nextInt(zipCodesSize));
-        int exactZipCodesCountBeforeCreation = Collections.frequency(getZipCodesResponseBeforeCreation.getResponseBodyZipCodes(), exactZipCode);
-
+        int zipCodesSize = getZipCodesResponseBeforeCreation.getResponseBody().size();
+        List<String> zipCodesListBeforeCreation = new ArrayList<>(getZipCodesResponseBeforeCreation.getResponseBody());
+        String exactZipCode = zipCodesListBeforeCreation.get(random.nextInt(zipCodesSize));
         UsersDto userToAdd = new UsersDto();
-        userToAdd = userToAdd.createUserDtoObject(age, name, userSex, exactZipCode);
+        userToAdd.setZipCode(exactZipCode);
 
         ResponseWrapper createUserResponse = usersClient.createUser(userToAdd);
 
-
         ResponseWrapper getZipCodesResponseAfterCreation = zipCodesClient.getZipCodes();
-        int exactZipCodesCountAfterCreation = Collections.frequency(getZipCodesResponseAfterCreation.getResponseBodyZipCodes(), exactZipCode);
-        UsersDto addedUser = new UsersDto();
+        List<String> zipCodesListAfterCreation = new ArrayList<>(getZipCodesResponseAfterCreation.getResponseBody());
         ResponseWrapper getUsersResponse = usersClient.getUsers();
-        ArrayList<UsersDto> usersList = getUsersResponse.getResponseBodyUsers();
-        if (usersList.contains(userToAdd)) {
-            addedUser = usersList.get(usersList.indexOf(userToAdd));
-        }
-        UsersDto finalUserToAdd = userToAdd;
-        UsersDto finalAddedUser = addedUser;
+        List<UsersDto> usersList = new ArrayList<>(getUsersResponse.getResponseBody());
+        UsersDto addedUser = usersList.get(usersList.indexOf(userToAdd));
         assertAll("Status code is 201 // user is added, zip code is removed",
-                () -> assertEquals(exactZipCodesCountBeforeCreation - 1, exactZipCodesCountAfterCreation),
-                //() -> assertTrue(usersList.contains(finalUserToAdd)),
-                () -> assertEquals(finalUserToAdd, finalAddedUser),
+                () -> assertFalse(zipCodesListAfterCreation.contains(exactZipCode)),
+                () -> assertTrue(usersList.contains(userToAdd)),
+                () -> assertEquals(userToAdd, addedUser),
                 () -> assertEquals(201, createUserResponse.getResponseCode()));
     }
 
     @Test
     public void createUserWithRequiredFieldsTest() {
         String name = RandomStringUtils.random(5, true, false);
-        UsersDto.sex userSex = randomSex();
-        UsersDto userToAdd = new UsersDto();
-        userToAdd = userToAdd.createUserDtoObject(name, userSex);
+        UsersDto.Sex userSex = UsersDto.Sex.getRandomSex();
+        UsersDto userToAdd = new UsersDto(name, userSex);
 
         ResponseWrapper createUserResponse = usersClient.createUser(userToAdd);
 
         ResponseWrapper getUsersResponse = usersClient.getUsers();
-        ArrayList<UsersDto> usersList = getUsersResponse.getResponseBodyUsers();
-        UsersDto addedUser = new UsersDto();
-        if (usersList.contains(userToAdd)) {
-            addedUser = usersList.get(usersList.indexOf(userToAdd));
-        }
-        UsersDto finalAddedUser = addedUser;
-        UsersDto finalUserToAdd = userToAdd;
+        List<UsersDto> usersList = new ArrayList<>(getUsersResponse.getResponseBody());
+        UsersDto addedUser = usersList.get(usersList.indexOf(userToAdd));
         assertAll("Status code is 201 // user is added",
-                () -> assertEquals(finalUserToAdd, finalAddedUser),
+                () -> assertTrue(usersList.contains(userToAdd)),
+                () -> assertEquals(userToAdd, addedUser),
                 () -> assertEquals(201, createUserResponse.getResponseCode()));
     }
 
     @Test
     public void createUserWithIncorrectZipCodeTest() {
         ResponseWrapper getZipCodesResponse = zipCodesClient.getZipCodes();
-        int age = RandomUtils.nextInt(1, 99);
-        String name = RandomStringUtils.random(5, true, false);
-        UsersDto.sex userSex = randomSex();
         String zipCode;
         do {
             zipCode = RandomStringUtils.random(5, false, true);
-        } while (getZipCodesResponse.getResponseBodyZipCodes().contains(zipCode));
+        } while (getZipCodesResponse.getResponseBody().contains(zipCode));
         UsersDto userToAdd = new UsersDto();
-        userToAdd = userToAdd.createUserDtoObject(age, name, userSex, zipCode);
+        userToAdd.setZipCode(zipCode);
 
         ResponseWrapper createUserResponse = usersClient.createUser(userToAdd);
 
         ResponseWrapper getUsersResponse = usersClient.getUsers();
-        ArrayList<UsersDto> usersList = getUsersResponse.getResponseBodyUsers();
-        UsersDto finalUserToAdd = userToAdd;
+        List<UsersDto> usersList = new ArrayList<>(getUsersResponse.getResponseBody());
         assertAll("Status code is 424 // user is NOT added",
-                () -> assertFalse(usersList.contains(finalUserToAdd)),
+                () -> assertFalse(usersList.contains(userToAdd)),
                 () -> assertEquals(424, createUserResponse.getResponseCode()));
     }
 
     @Test
     public void createUserWithDuplicateNameAndSexTest() {
         ResponseWrapper getUsersBeforeAddingDuplicateResponse = usersClient.getUsers();
-        ArrayList<UsersDto> usersListBeforeAddingDuplicate = getUsersBeforeAddingDuplicateResponse.getResponseBodyUsers();
+        List<UsersDto> usersListBeforeAddingDuplicate = new ArrayList<>(getUsersBeforeAddingDuplicateResponse.getResponseBody());
         UsersDto userWithDuplicateNameAndSex = usersListBeforeAddingDuplicate.get(random.nextInt(usersListBeforeAddingDuplicate.size()));
+        UsersDto userToAdd = new UsersDto(userWithDuplicateNameAndSex.getName(), userWithDuplicateNameAndSex.getUserSex());
 
-        ResponseWrapper createUserResponse = usersClient.createUser(userWithDuplicateNameAndSex);
+        ResponseWrapper createUserResponse = usersClient.createUser(userToAdd);
 
         ResponseWrapper getUsersResponseAfterAddingDuplicate = usersClient.getUsers();
-        ArrayList<UsersDto> usersListAfterAddingDuplicate = getUsersResponseAfterAddingDuplicate.getResponseBodyUsers();
+        List<UsersDto> usersListAfterAddingDuplicate = new ArrayList<>(getUsersResponseAfterAddingDuplicate.getResponseBody());
         assertAll("Status code is 400 // user is NOT added",
                 () -> assertEquals(usersListBeforeAddingDuplicate, usersListAfterAddingDuplicate),
                 () -> assertEquals(400, createUserResponse.getResponseCode()));
+    }
+
+    @Test
+    public void createUserWithoutRequiredField() {
+        String name = null;
+        UsersDto.Sex userSex = null;
+        UsersDto userToAdd = new UsersDto(name, userSex);
+
+        ResponseWrapper createUserResponse = usersClient.createUser(userToAdd);
+
+        ResponseWrapper getUsersResponse = usersClient.getUsers();
+        List<UsersDto> usersList = new ArrayList<>(getUsersResponse.getResponseBody());
+        assertAll("Status code is 409 // user is NOT added",
+                () -> assertFalse(usersList.contains(userToAdd)),
+                () -> assertEquals(409, createUserResponse.getResponseCode()));
     }
 }

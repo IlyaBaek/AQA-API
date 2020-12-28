@@ -1,19 +1,17 @@
 import reseponsesDTO.UsersDto;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class ResponseWrapper {
     private int responseCode;
-    private List<String> responseBodyZipCodes;
-    private ArrayList<UsersDto> responseBodyUsers;
+    private ArrayList responseBody;
 
-    public ArrayList<UsersDto> getResponseBodyUsers() {
-        return responseBodyUsers;
+    public ArrayList getResponseBody() {
+        return responseBody;
     }
 
-    public void setResponseBodyUsers(ArrayList<UsersDto> responseBodyUsers) {
-        this.responseBodyUsers = responseBodyUsers;
+    public void setResponseBody(ArrayList responseBody) {
+        this.responseBody = responseBody;
     }
 
     public int getResponseCode() {
@@ -22,13 +20,5 @@ public class ResponseWrapper {
 
     public void setResponseCode(int responseCode) {
         this.responseCode = responseCode;
-    }
-
-    public List<String> getResponseBodyZipCodes() {
-        return responseBodyZipCodes;
-    }
-
-    public void setResponseBodyZipCodes(List<String> responseBody) {
-        this.responseBodyZipCodes = responseBody;
     }
 }

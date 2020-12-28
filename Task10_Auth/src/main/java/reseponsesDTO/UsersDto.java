@@ -1,25 +1,45 @@
 package reseponsesDTO;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
 
 public class UsersDto {
-    private int age;
-    private String name;
+    private int age = RandomUtils.nextInt(1, 99);
+    private String name = RandomStringUtils.random(5, true, false);
     @JsonProperty("sex")
-    public sex userSex;
+    public Sex userSex = UsersDto.Sex.getRandomSex();
     private String zipCode;
 
-    public enum sex {FEMALE, MALE}
+    public enum Sex {
+        FEMALE, MALE;
 
-    public void setUserSex(sex input) {
+        public static Sex getRandomSex() {
+            Random random = new Random();
+            List<Sex> VALUES =
+                    List.of(Sex.values());
+            int SIZE = VALUES.size();
+            return VALUES.get(random.nextInt(SIZE));
+        }
+    }
+
+    public UsersDto() {
+    }
+
+    public UsersDto(String nameOfUser, Sex sexOfUser) {
+        name = nameOfUser;
+        userSex = sexOfUser;
+    }
+
+    public void setUserSex(Sex input) {
         userSex = input;
     }
 
-    public sex getUserSex() {
+    public Sex getUserSex() {
         return userSex;
     }
 
@@ -53,6 +73,7 @@ public class UsersDto {
         if (this == o) return true;
         if (!(o instanceof UsersDto)) return false;
         UsersDto usersDto = (UsersDto) o;
+        if (getName() == null || getUserSex() == null) return false;
         return getName().equals(usersDto.getName()) &&
                 getUserSex() == usersDto.getUserSex();
     }
@@ -60,29 +81,5 @@ public class UsersDto {
     @Override
     public int hashCode() {
         return Objects.hash(getName(), getUserSex());
-    }
-
-    public UsersDto createUserDtoObject(int age, String name, UsersDto.sex sex, String zipCode) {
-        UsersDto usersDto = new UsersDto();
-        usersDto.setAge(age);
-        usersDto.setName(name);
-        usersDto.setUserSex(sex);
-        usersDto.setZipCode(zipCode);
-        return usersDto;
-    }
-
-    public UsersDto createUserDtoObject(String name, UsersDto.sex sex) {
-        UsersDto usersDto = new UsersDto();
-        usersDto.setName(name);
-        usersDto.setUserSex(sex);
-        return usersDto;
-    }
-
-    public static UsersDto.sex randomSex()  {
-        Random random = new Random();
-        List<sex> VALUES =
-                List.of(UsersDto.sex.values());
-        int SIZE = VALUES.size();
-        return VALUES.get(random.nextInt(SIZE));
     }
 }

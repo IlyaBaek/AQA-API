@@ -1,3 +1,4 @@
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -19,7 +20,7 @@ public class ZipCodesClient {
             response = HttpClientSingleton.getInstance().getHttpClient().execute(httpGet);
 
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
-            responseWrapper.setResponseBodyZipCodes(Stream.of(Mapper.entityToObj(response.getEntity(), String[].class)).collect(Collectors.toCollection(ArrayList::new)));
+            responseWrapper.setResponseBody(Stream.of(Mapper.entityToObj(response.getEntity(), String[].class)).collect(Collectors.toCollection(ArrayList::new)));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -46,7 +47,7 @@ public class ZipCodesClient {
 
             response = HttpClientSingleton.getInstance().getHttpClient().execute(httpPost);
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
-            responseWrapper.setResponseBodyZipCodes(Stream.of(Mapper.entityToObj(response.getEntity(), String[].class)).collect(Collectors.toCollection(ArrayList::new)));
+            responseWrapper.setResponseBody(Stream.of(Mapper.entityToObj(response.getEntity(), String[].class)).collect(Collectors.toCollection(ArrayList::new)));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -57,5 +58,16 @@ public class ZipCodesClient {
             e.printStackTrace();
         }
         return responseWrapper;
+    }
+
+    public static void createZipCodeIfNotExist(ZipCodesClient zipCodesClient){
+        ResponseWrapper responseWrapper = zipCodesClient.getZipCodes();
+        List<String> zipCodesList = new ArrayList<>(responseWrapper.getResponseBody());
+        if (zipCodesList.isEmpty()){
+            List<String> newZipCodes = new ArrayList<>();
+            newZipCodes.add(RandomStringUtils.random(5, false, true));
+            newZipCodes.add(RandomStringUtils.random(5, false, true));
+            zipCodesClient.postZipCodes(newZipCodes);
+        }
     }
 }
