@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UsersClient {
-    public ResponseWrapper createUser(UsersDto usersDto) {
+    public static ResponseWrapper createUser(UsersDto usersDto) {
         HttpPost httpPost = new HttpPost(PropertiesReader.get("appURI") + PropertiesReader.get("usersURI"));
         httpPost.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
         ResponseWrapper responseWrapper = new ResponseWrapper();
@@ -43,7 +43,7 @@ public class UsersClient {
         return responseWrapper;
     }
 
-    public ResponseWrapper getUsers() {
+    public static ResponseWrapper getUsers() {
         HttpGet httpGet = new HttpGet(PropertiesReader.get("appURI") + PropertiesReader.get("usersURI"));
         httpGet.addHeader("Authorization", AuthSingleton.getInstance().getReadToken());
         ResponseWrapper responseWrapper = new ResponseWrapper();
@@ -52,7 +52,8 @@ public class UsersClient {
             response = HttpClientSingleton.getInstance().getHttpClient().execute(httpGet);
 
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
-            responseWrapper.setResponseBody(Stream.of(Mapper.entityToObj(response.getEntity(), UsersDto[].class)).collect(Collectors.toCollection(ArrayList::new)));
+            List<UsersDto> usersResponseBody = Stream.of(Mapper.entityToObj(response.getEntity(), UsersDto[].class)).collect(Collectors.toCollection(ArrayList::new));
+            responseWrapper.setResponseBody(usersResponseBody);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -66,14 +67,13 @@ public class UsersClient {
         return responseWrapper;
     }
 
-    public static void createUserIfNotExist(UsersClient usersClient) {
-        ZipCodesClient zipCodesClient = new ZipCodesClient();
-        ZipCodesClient.createZipCodeIfNotExist(zipCodesClient);
-        ResponseWrapper responseWrapper = usersClient.getUsers();
-        List<UsersDto> usersDtoList = new ArrayList<>(responseWrapper.getResponseBody());
+    public static void createUserIfNotExist() {
+        ZipCodesClient.createZipCodeIfNotExist();
+        ResponseWrapper responseWrapper = getUsers();
+        List<UsersDto> usersDtoList = (List<UsersDto>) responseWrapper.getResponseBody();
         if (usersDtoList.isEmpty()) {
             UsersDto usersDto = new UsersDto();
-            usersClient.createUser(usersDto);
+            createUser(usersDto);
         }
     }
 }

@@ -9,10 +9,10 @@ import java.util.Objects;
 import java.util.Random;
 
 public class UsersDto {
-    private int age = RandomUtils.nextInt(1, 99);
-    private String name = RandomStringUtils.random(5, true, false);
+    private Integer age;
+    private String name;
     @JsonProperty("sex")
-    public Sex userSex = UsersDto.Sex.getRandomSex();
+    public Sex userSex;
     private String zipCode;
 
     public enum Sex {
@@ -28,6 +28,9 @@ public class UsersDto {
     }
 
     public UsersDto() {
+        age = RandomUtils.nextInt(1, 99);
+        name = RandomStringUtils.random(5, true, false);
+        userSex = UsersDto.Sex.getRandomSex();
     }
 
     public UsersDto(String nameOfUser, Sex sexOfUser) {
@@ -43,11 +46,11 @@ public class UsersDto {
         return userSex;
     }
 
-    public int getAge() {
+    public Integer getAge() {
         return age;
     }
 
-    public void setAge(int age) {
+    public void setAge(Integer age) {
         this.age = age;
     }
 
@@ -72,14 +75,16 @@ public class UsersDto {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof UsersDto)) return false;
-        UsersDto usersDto = (UsersDto) o;
         if (getName() == null || getUserSex() == null) return false;
-        return getName().equals(usersDto.getName()) &&
-                getUserSex() == usersDto.getUserSex();
+        UsersDto usersDto = (UsersDto) o;
+        return Objects.equals(getAge(), usersDto.getAge()) &&
+                getName().equals(usersDto.getName()) &&
+                getUserSex() == usersDto.getUserSex() &&
+                Objects.equals(getZipCode(), usersDto.getZipCode());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getUserSex());
+        return Objects.hash(getAge(), getName(), getUserSex(), getZipCode());
     }
 }

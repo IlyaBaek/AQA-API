@@ -1,16 +1,12 @@
-import reseponsesDTO.UsersDto;
-
-import java.util.ArrayList;
-
 public class ResponseWrapper {
     private int responseCode;
-    private ArrayList responseBody;
+    private Object responseBody;
 
-    public ArrayList getResponseBody() {
+    public Object getResponseBody() {
         return responseBody;
     }
 
-    public void setResponseBody(ArrayList responseBody) {
+    public void setResponseBody(Object responseBody) {
         this.responseBody = responseBody;
     }
 

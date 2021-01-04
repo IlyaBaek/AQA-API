@@ -11,12 +11,11 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ZipCodesTests {
-    private ZipCodesClient zipCodesClient = new ZipCodesClient();
 
     @Test
     public void getZipCodesTest() {
-        ResponseWrapper responseWrapper = zipCodesClient.getZipCodes();
-        List<String> getZipCodesResponseBody = new ArrayList<>(responseWrapper.getResponseBody());
+        ResponseWrapper responseWrapper = ZipCodesClient.getZipCodes();
+        List<String> getZipCodesResponseBody = (List<String>) responseWrapper.getResponseBody();
 
         System.out.println(getZipCodesResponseBody);
 
@@ -28,8 +27,8 @@ public class ZipCodesTests {
 
     @Test
     public void addZipCodesTest() {
-        ResponseWrapper responseGet = zipCodesClient.getZipCodes();
-        List<String> availableZipCodes = new ArrayList<>(responseGet.getResponseBody());
+        ResponseWrapper responseGet = ZipCodesClient.getZipCodes();
+        List<String> availableZipCodes = (List<String>) responseGet.getResponseBody();
 
         List<String> newZipCodes = new ArrayList<>();
         newZipCodes.add(RandomStringUtils.random(5, false, true));
@@ -39,8 +38,8 @@ public class ZipCodesTests {
         expectedZipCodesAfterPost.addAll(availableZipCodes);
         expectedZipCodesAfterPost.addAll(newZipCodes);
 
-        ResponseWrapper responsePost = zipCodesClient.postZipCodes(newZipCodes);
-        List<String> resultZipCodes = new ArrayList<>(responsePost.getResponseBody());
+        ResponseWrapper responsePost = ZipCodesClient.postZipCodes(newZipCodes);
+        List<String> resultZipCodes = (List<String>) responsePost.getResponseBody();
 
         assertAll("Status code is 201 and Zip codes from request body are added to available zip codes",
                 () -> assertEquals(expectedZipCodesAfterPost, resultZipCodes),
@@ -49,9 +48,9 @@ public class ZipCodesTests {
 
     @Test
     public void addDuplicatesZipCodesAndCheckThereAreNoDuplicationsTest() {
-        ZipCodesClient.createZipCodeIfNotExist(zipCodesClient);
-        ResponseWrapper responseGet = zipCodesClient.getZipCodes();
-        List<String> availableZipCodes = new ArrayList<>(responseGet.getResponseBody());
+        ZipCodesClient.createZipCodeIfNotExist();
+        ResponseWrapper responseGet = ZipCodesClient.getZipCodes();
+        List<String> availableZipCodes = (List<String>) responseGet.getResponseBody();
 
         Random random = new Random();
         List<String> newZipCodes = new ArrayList<>();
@@ -62,8 +61,8 @@ public class ZipCodesTests {
         expectedZipCodesAfterPost.addAll(availableZipCodes);
         expectedZipCodesAfterPost.addAll(newZipCodes);
 
-        ResponseWrapper responsePost = zipCodesClient.postZipCodes(newZipCodes);
-        List<String> resultZipCodes = new ArrayList<>(responsePost.getResponseBody());
+        ResponseWrapper responsePost = ZipCodesClient.postZipCodes(newZipCodes);
+        List<String> resultZipCodes = (List<String>) responsePost.getResponseBody();
         List<String> resultZipCodesWithoutDuplications = new ArrayList<>(new HashSet<>(resultZipCodes));
 
         assertAll("Status code is 201 // Zip codes from request body are added to available zip codes //  There are no duplications in available zip codes",
@@ -74,12 +73,12 @@ public class ZipCodesTests {
 
     @Test
     public void addAlreadyUsedZipCodeAndCheckThereIsNoDuplicationInUsedAndNotUsedZipCodes() {
-        UsersClient usersClient = new UsersClient();
-        UsersClient.createUserIfNotExist(usersClient);
-        ResponseWrapper responseGet = zipCodesClient.getZipCodes();
-        List<String> availableZipCodes = new ArrayList<>(responseGet.getResponseBody());
-        ResponseWrapper getUsersResponse = usersClient.getUsers();
-        List<UsersDto> usersList = new ArrayList<>(getUsersResponse.getResponseBody());
+        UsersClient.createUserIfNotExist();
+        ZipCodesClient.createZipCodeIfNotExist();
+        ResponseWrapper responseGet = ZipCodesClient.getZipCodes();
+        List<String> availableZipCodes = (List<String>) responseGet.getResponseBody();
+        ResponseWrapper getUsersResponse = UsersClient.getUsers();
+        List<UsersDto> usersList = (List<UsersDto>) getUsersResponse.getResponseBody();
         Random random = new Random();
         List<String> newZipCodes = new ArrayList<>();
         newZipCodes.add(usersList.get(random.nextInt(usersList.size())).getZipCode());
@@ -88,9 +87,9 @@ public class ZipCodesTests {
         expectedZipCodesAfterPost.addAll(availableZipCodes);
         expectedZipCodesAfterPost.addAll(newZipCodes);
 
-        ResponseWrapper responsePost = zipCodesClient.postZipCodes(newZipCodes);
+        ResponseWrapper responsePost = ZipCodesClient.postZipCodes(newZipCodes);
 
-        List<String> zipCodesAfterAdding = new ArrayList<>(responsePost.getResponseBody());
+        List<String> zipCodesAfterAdding = (List<String>) responsePost.getResponseBody();
         List<String> allZipCodes = usersList
                 .stream()
                 .map(UsersDto::getZipCode)
