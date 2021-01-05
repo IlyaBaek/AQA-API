@@ -77,7 +77,7 @@ public class ZipCodesTests {
         ZipCodesClient.createZipCodeIfNotExist();
         ResponseWrapper responseGet = ZipCodesClient.getZipCodes();
         List<String> availableZipCodes = (List<String>) responseGet.getResponseBody();
-        ResponseWrapper getUsersResponse = UsersClient.getUsers();
+        ResponseWrapper getUsersResponse = UsersClient.getUsers(null, null, null);
         List<UsersDto> usersList = (List<UsersDto>) getUsersResponse.getResponseBody();
         Random random = new Random();
         List<String> newZipCodes = new ArrayList<>();

@@ -2,10 +2,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import reseponsesDTO.UsersDto;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,9 +45,25 @@ public class UsersClient {
         return responseWrapper;
     }
 
-    public static ResponseWrapper getUsers() {
-        HttpGet httpGet = new HttpGet(PropertiesReader.get("appURI") + PropertiesReader.get("usersURI"));
-        httpGet.addHeader("Authorization", AuthSingleton.getInstance().getReadToken());
+    public static ResponseWrapper getUsers(Integer olderThan, Integer youngerThan, UsersDto.Sex sex) {
+        URIBuilder builder;
+        HttpGet httpGet = null;
+        try {
+            builder = new URIBuilder(PropertiesReader.get("appURI") + PropertiesReader.get("usersURI"));
+            if (olderThan != null) {
+                builder.setParameter("olderThan", String.valueOf(olderThan));
+            }
+            if (youngerThan != null) {
+                builder.setParameter("youngerThan", String.valueOf(youngerThan));
+            }
+            if (sex != null) {
+                builder.setParameter("sex", String.valueOf(sex));
+            }
+            httpGet = new HttpGet(builder.build());
+            httpGet.addHeader("Authorization", AuthSingleton.getInstance().getReadToken());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
         ResponseWrapper responseWrapper = new ResponseWrapper();
         CloseableHttpResponse response = null;
         try {
@@ -69,7 +87,7 @@ public class UsersClient {
 
     public static void createUserIfNotExist() {
         ZipCodesClient.createZipCodeIfNotExist();
-        ResponseWrapper responseWrapper = getUsers();
+        ResponseWrapper responseWrapper = getUsers(null, null, null);
         List<UsersDto> usersDtoList = (List<UsersDto>) responseWrapper.getResponseBody();
         if (usersDtoList.isEmpty()) {
             UsersDto usersDto = new UsersDto();
