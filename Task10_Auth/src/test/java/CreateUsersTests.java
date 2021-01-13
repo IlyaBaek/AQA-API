@@ -22,7 +22,7 @@ public class CreateUsersTests {
 
         ResponseWrapper getZipCodesResponseAfterCreation = ZipCodesClient.getZipCodes();
         List<String> zipCodesListAfterCreation = (List<String>) getZipCodesResponseAfterCreation.getResponseBody();
-        ResponseWrapper getUsersResponse = UsersClient.getUsers(null, null, null);
+        ResponseWrapper getUsersResponse = UsersClient.getUsers();
         List<UsersDto> usersList = (List<UsersDto>) getUsersResponse.getResponseBody();
         UsersDto addedUser = usersList.get(usersList.indexOf(userToAdd));
         assertAll("Status code is 201 // user is added, zip code is removed",
@@ -39,7 +39,7 @@ public class CreateUsersTests {
 
         ResponseWrapper createUserResponse = UsersClient.createUser(userToAdd);
 
-        ResponseWrapper getUsersResponse = UsersClient.getUsers(null, null, null);
+        ResponseWrapper getUsersResponse = UsersClient.getUsers();
         List<UsersDto> usersList = (List<UsersDto>) getUsersResponse.getResponseBody();
         UsersDto addedUser = usersList.get(usersList.indexOf(userToAdd));
         assertAll("Status code is 201 // user is added",
@@ -55,7 +55,7 @@ public class CreateUsersTests {
 
         ResponseWrapper createUserResponse = UsersClient.createUser(userToAdd);
 
-        ResponseWrapper getUsersResponse = UsersClient.getUsers(null, null, null);
+        ResponseWrapper getUsersResponse = UsersClient.getUsers();
         List<UsersDto> usersList = (List<UsersDto>) getUsersResponse.getResponseBody();
         assertAll("Status code is 424 // user is NOT added",
                 () -> assertFalse(usersList.contains(userToAdd)),
@@ -64,14 +64,14 @@ public class CreateUsersTests {
 
     @Test
     public void createUserWithDuplicateNameAndSexTest() {
-        ResponseWrapper getUsersBeforeAddingDuplicateResponse = UsersClient.getUsers(null, null, null);
+        ResponseWrapper getUsersBeforeAddingDuplicateResponse = UsersClient.getUsers();
         List<UsersDto> usersListBeforeAddingDuplicate = (List<UsersDto>) getUsersBeforeAddingDuplicateResponse.getResponseBody();
         UsersDto userWithDuplicateNameAndSex = usersListBeforeAddingDuplicate.get(random.nextInt(usersListBeforeAddingDuplicate.size()));
         UsersDto userToAdd = new UsersDto(userWithDuplicateNameAndSex.getName(), userWithDuplicateNameAndSex.getUserSex());
 
         ResponseWrapper createUserResponse = UsersClient.createUser(userToAdd);
 
-        ResponseWrapper getUsersResponseAfterAddingDuplicate = UsersClient.getUsers(null, null, null);
+        ResponseWrapper getUsersResponseAfterAddingDuplicate = UsersClient.getUsers();
         List<UsersDto> usersListAfterAddingDuplicate = (List<UsersDto>) getUsersResponseAfterAddingDuplicate.getResponseBody();
         assertAll("Status code is 400 // user is NOT added",
                 () -> assertEquals(usersListBeforeAddingDuplicate, usersListAfterAddingDuplicate),
@@ -84,7 +84,7 @@ public class CreateUsersTests {
 
         ResponseWrapper createUserResponse = UsersClient.createUser(userToAdd);
 
-        ResponseWrapper getUsersResponse = UsersClient.getUsers(null, null, null);
+        ResponseWrapper getUsersResponse = UsersClient.getUsers();
         List<UsersDto> usersList = (List<UsersDto>) getUsersResponse.getResponseBody();
         assertAll("Status code is 409 // user is NOT added",
                 () -> assertFalse(usersList.contains(userToAdd)),

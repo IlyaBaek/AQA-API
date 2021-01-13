@@ -45,6 +45,8 @@ public class UsersClient {
         return responseWrapper;
     }
 
+    public static ResponseWrapper getUsers() { return getUsers(null, null, null); }
+
     public static ResponseWrapper getUsers(Integer olderThan, Integer youngerThan, UsersDto.Sex sex) {
         URIBuilder builder;
         HttpGet httpGet = null;
@@ -87,7 +89,7 @@ public class UsersClient {
 
     public static void createUserIfNotExist() {
         ZipCodesClient.createZipCodeIfNotExist();
-        ResponseWrapper responseWrapper = getUsers(null, null, null);
+        ResponseWrapper responseWrapper = getUsers();
         List<UsersDto> usersDtoList = (List<UsersDto>) responseWrapper.getResponseBody();
         if (usersDtoList.isEmpty()) {
             UsersDto usersDto = new UsersDto();
