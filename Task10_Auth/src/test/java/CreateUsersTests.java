@@ -1,10 +1,10 @@
 import org.junit.jupiter.api.Test;
-        import reseponsesDTO.UsersDto;
+import reseponsesDTO.UsersDto;
 
-        import java.util.List;
-        import java.util.Random;
+import java.util.List;
+import java.util.Random;
 
-        import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CreateUsersTests {
     private static final Random random = new Random();
