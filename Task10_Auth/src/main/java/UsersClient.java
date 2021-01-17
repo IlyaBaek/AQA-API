@@ -1,9 +1,8 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
+import reseponsesDTO.UpdateUserDto;
 import reseponsesDTO.UsersDto;
 
 import java.io.IOException;
@@ -14,6 +13,45 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UsersClient {
+    public static ResponseWrapper updateUser(UpdateUserDto updatedUserInfo) {
+        ResponseWrapper responseWrapper = new ResponseWrapper();
+        CloseableHttpResponse response = null;
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String json = objectMapper.writeValueAsString(updatedUserInfo);
+            StringEntity entity = new StringEntity(json);
+            if (UpdateUserDto.allFieldsAreNew(updatedUserInfo)) {
+                HttpPatch httpPatch = new HttpPatch(PropertiesReader.get("appURI") + PropertiesReader.get("usersURI"));
+                httpPatch.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
+                httpPatch.setEntity(entity);
+                httpPatch.setHeader("Accept", "*/*");
+                httpPatch.setHeader("Content-type", "application/json");
+
+                response = HttpClientSingleton.getInstance().getHttpClient().execute(httpPatch);
+            } else {
+                HttpPut httpPut = new HttpPut(PropertiesReader.get("appURI") + PropertiesReader.get("usersURI"));
+                httpPut.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
+                httpPut.setEntity(entity);
+                httpPut.setHeader("Accept", "*/*");
+                httpPut.setHeader("Content-type", "application/json");
+
+                response = HttpClientSingleton.getInstance().getHttpClient().execute(httpPut);
+            }
+            assert response != null;
+            responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                assert response != null;
+                response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return responseWrapper;
+    }
+
     public static ResponseWrapper createUser(UsersDto usersDto) {
         HttpPost httpPost = new HttpPost(PropertiesReader.get("appURI") + PropertiesReader.get("usersURI"));
         httpPost.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
@@ -45,7 +83,9 @@ public class UsersClient {
         return responseWrapper;
     }
 
-    public static ResponseWrapper getUsers() { return getUsers(null, null, null); }
+    public static ResponseWrapper getUsers() {
+        return getUsers(null, null, null);
+    }
 
     public static ResponseWrapper getUsers(Integer olderThan, Integer youngerThan, UsersDto.Sex sex) {
         URIBuilder builder;
