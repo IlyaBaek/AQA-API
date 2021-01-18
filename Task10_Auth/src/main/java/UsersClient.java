@@ -10,10 +10,40 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UsersClient {
+    public static ResponseWrapper deleteUser(UsersDto usersDto) {
+        HttpDeleteWithBody httpDelete = new HttpDeleteWithBody(PropertiesReader.get("appURI") + PropertiesReader.get("usersURI"));
+        httpDelete.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
+        ResponseWrapper responseWrapper = new ResponseWrapper();
+        CloseableHttpResponse response = null;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(usersDto);
+            StringEntity entity = new StringEntity(json);
+            httpDelete.setEntity(entity);
+            httpDelete.setHeader("Accept", "*/*");
+            httpDelete.setHeader("Content-type", "application/json");
+
+            response = HttpClientSingleton.getInstance().getHttpClient().execute(httpDelete);
+
+            responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                assert response != null;
+                response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return responseWrapper;
+    }
+
     public static ResponseWrapper createUser(UsersDto usersDto) {
         HttpPost httpPost = new HttpPost(PropertiesReader.get("appURI") + PropertiesReader.get("usersURI"));
         httpPost.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
@@ -45,7 +75,9 @@ public class UsersClient {
         return responseWrapper;
     }
 
-    public static ResponseWrapper getUsers() { return getUsers(null, null, null); }
+    public static ResponseWrapper getUsers() {
+        return getUsers(null, null, null);
+    }
 
     public static ResponseWrapper getUsers(Integer olderThan, Integer youngerThan, UsersDto.Sex sex) {
         URIBuilder builder;
@@ -88,11 +120,14 @@ public class UsersClient {
     }
 
     public static void createUserIfNotExist() {
+        Random random = new Random();
         ZipCodesClient.createZipCodeIfNotExist();
+        List<String> availableZipCodes = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
         ResponseWrapper responseWrapper = getUsers();
         List<UsersDto> usersDtoList = (List<UsersDto>) responseWrapper.getResponseBody();
         if (usersDtoList.isEmpty()) {
             UsersDto usersDto = new UsersDto();
+            usersDto.setZipCode(availableZipCodes.get(random.nextInt(availableZipCodes.size())));
             createUser(usersDto);
         }
     }
