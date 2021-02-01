@@ -31,6 +31,6 @@ public class UpdateUserDto {
         return !(Objects.equals(updateUserDto.userNewValues.getName(), updateUserDto.userToChange.getName()) |
                 updateUserDto.userNewValues.getAge().equals(updateUserDto.userToChange.getAge()) |
                 Objects.equals(updateUserDto.userNewValues.getUserSex(), (updateUserDto.userToChange.getUserSex())) |
-                updateUserDto.userNewValues.getZipCode().equals(updateUserDto.userToChange.getZipCode()));
+                Objects.equals(updateUserDto.userNewValues.getZipCode(), (updateUserDto.userToChange.getZipCode())));
     }
 }

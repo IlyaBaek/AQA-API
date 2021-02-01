@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -128,11 +129,14 @@ public class UsersClient {
     }
 
     public static void createUserIfNotExist() {
+        Random random = new Random();
         ZipCodesClient.createZipCodeIfNotExist();
         ResponseWrapper responseWrapper = getUsers();
         List<UsersDto> usersDtoList = (List<UsersDto>) responseWrapper.getResponseBody();
         if (usersDtoList.isEmpty()) {
             UsersDto usersDto = new UsersDto();
+            List<String> availableZipCodes = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
+            usersDto.setZipCode(availableZipCodes.get(random.nextInt(availableZipCodes.size())));
             createUser(usersDto);
         }
     }
