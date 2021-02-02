@@ -64,14 +64,19 @@ public class ZipCodesClient {
     }
 
     public static void createZipCodeIfNotExist() {
-        ResponseWrapper responseWrapper = getZipCodes();
-        List<String> zipCodesList = (List<String>) responseWrapper.getResponseBody();
+        List<String> zipCodesList = (List<String>) getZipCodes().getResponseBody();
         if (zipCodesList.isEmpty()) {
             List<String> newZipCodes = new ArrayList<>();
             newZipCodes.add(RandomStringUtils.random(5, false, true));
             newZipCodes.add(RandomStringUtils.random(5, false, true));
             postZipCodes(newZipCodes);
         }
+    }
+
+    public static void createRandomZipCodes(){
+        List<String> newZipCodes = new ArrayList<>();
+        newZipCodes.add(RandomStringUtils.random(5, false, true));
+        postZipCodes(newZipCodes);
     }
 
     public static String getRandomNotExistingZipCode() {

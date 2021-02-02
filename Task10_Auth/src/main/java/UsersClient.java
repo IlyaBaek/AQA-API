@@ -1,9 +1,8 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
+import reseponsesDTO.UpdateUserDto;
 import reseponsesDTO.UsersDto;
 
 import java.io.IOException;
@@ -30,6 +29,46 @@ public class UsersClient {
 
             response = HttpClientSingleton.getInstance().getHttpClient().execute(httpDelete);
 
+
+            responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                assert response != null;
+                response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return responseWrapper;
+    }
+
+    public static ResponseWrapper updateUser(UpdateUserDto updatedUserInfo) {
+        ResponseWrapper responseWrapper = new ResponseWrapper();
+        CloseableHttpResponse response = null;
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String json = objectMapper.writeValueAsString(updatedUserInfo);
+            StringEntity entity = new StringEntity(json);
+            if (UpdateUserDto.allFieldsAreNew(updatedUserInfo)) {
+                HttpPatch httpPatch = new HttpPatch(PropertiesReader.get("appURI") + PropertiesReader.get("usersURI"));
+                httpPatch.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
+                httpPatch.setEntity(entity);
+                httpPatch.setHeader("Accept", "*/*");
+                httpPatch.setHeader("Content-type", "application/json");
+
+                response = HttpClientSingleton.getInstance().getHttpClient().execute(httpPatch);
+            } else {
+                HttpPut httpPut = new HttpPut(PropertiesReader.get("appURI") + PropertiesReader.get("usersURI"));
+                httpPut.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
+                httpPut.setEntity(entity);
+                httpPut.setHeader("Accept", "*/*");
+                httpPut.setHeader("Content-type", "application/json");
+
+                response = HttpClientSingleton.getInstance().getHttpClient().execute(httpPut);
+            }
+            assert response != null;
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
         } catch (IOException e) {
             e.printStackTrace();
@@ -122,11 +161,11 @@ public class UsersClient {
     public static void createUserIfNotExist() {
         Random random = new Random();
         ZipCodesClient.createZipCodeIfNotExist();
-        List<String> availableZipCodes = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
         ResponseWrapper responseWrapper = getUsers();
         List<UsersDto> usersDtoList = (List<UsersDto>) responseWrapper.getResponseBody();
         if (usersDtoList.isEmpty()) {
             UsersDto usersDto = new UsersDto();
+            List<String> availableZipCodes = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
             usersDto.setZipCode(availableZipCodes.get(random.nextInt(availableZipCodes.size())));
             createUser(usersDto);
         }
