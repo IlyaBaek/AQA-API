@@ -14,6 +14,36 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UsersClient {
+    public static ResponseWrapper deleteUser(UsersDto usersDto) {
+        HttpDeleteWithBody httpDelete = new HttpDeleteWithBody(PropertiesReader.get("appURI") + PropertiesReader.get("usersURI"));
+        httpDelete.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
+        ResponseWrapper responseWrapper = new ResponseWrapper();
+        CloseableHttpResponse response = null;
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String json = objectMapper.writeValueAsString(usersDto);
+            StringEntity entity = new StringEntity(json);
+            httpDelete.setEntity(entity);
+            httpDelete.setHeader("Accept", "*/*");
+            httpDelete.setHeader("Content-type", "application/json");
+
+            response = HttpClientSingleton.getInstance().getHttpClient().execute(httpDelete);
+
+
+            responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                assert response != null;
+                response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return responseWrapper;
+    }
+
     public static ResponseWrapper updateUser(UpdateUserDto updatedUserInfo) {
         ResponseWrapper responseWrapper = new ResponseWrapper();
         CloseableHttpResponse response = null;
