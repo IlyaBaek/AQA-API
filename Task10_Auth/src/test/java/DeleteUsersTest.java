@@ -26,8 +26,8 @@ public class DeleteUsersTest {
         List<String> zipCodesAfterDelete = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
         assertAll("204, user removed, zip code is back",
                 () -> assertEquals(204, deleteUserResponse.getResponseCode()),
-                () -> assertFalse(userListAfterDelete.contains(usersDto), "removed user doesn't exist in users list"),
-                () -> assertTrue(zipCodesAfterDelete.contains(usersDto.getZipCode()), "removed user zip code added to the zip codes list")
+                () -> assertFalse(userListAfterDelete.contains(usersDto), "removed user exist in users list"),
+                () -> assertTrue(zipCodesAfterDelete.contains(usersDto.getZipCode()), "removed user zip code is NOT added to the zip codes list")
         );
     }
 
@@ -48,8 +48,8 @@ public class DeleteUsersTest {
         usersDto.setAge(age);
         assertAll("204, user removed, zip code is back",
                 () -> assertEquals(204, responseWrapper.getResponseCode()),
-                () -> assertFalse(userListAfterDelete.contains(usersDto), "removed user doesn't exist in users list"),
-                () -> assertTrue(zipCodesAfterDelete.contains(usersDto.getZipCode()), "removed user zip code added to the zip codes list")
+                () -> assertFalse(userListAfterDelete.contains(usersDto), "removed user exist in users list"),
+                () -> assertTrue(zipCodesAfterDelete.contains(usersDto.getZipCode()), "removed user zip code is NOT added to the zip codes list")
         );
     }
 
@@ -69,7 +69,7 @@ public class DeleteUsersTest {
         usersDto.setUserSex(sex);
         assertAll("409, user is NOT removed",
                 () -> assertEquals(409, responseWrapper.getResponseCode()),
-                () -> assertTrue(userListAfterDelete.contains(usersDto), "User wasn't removed and exist in users list")
+                () -> assertTrue(userListAfterDelete.contains(usersDto), "User removed and doesn't exist in users list")
         );
     }
 }
