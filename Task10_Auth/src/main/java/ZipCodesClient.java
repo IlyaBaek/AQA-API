@@ -7,7 +7,6 @@ import org.apache.http.entity.StringEntity;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -73,10 +72,12 @@ public class ZipCodesClient {
         }
     }
 
-    public static void createRandomZipCodes(){
+    public static void createRandomZipCodes(int count) {
         List<String> newZipCodes = new ArrayList<>();
-        newZipCodes.add(RandomStringUtils.random(5, false, true));
-        postZipCodes(newZipCodes);
+        for (int i = 0; i < count; i++) {
+            newZipCodes.add(RandomStringUtils.random(5, false, true));
+        }
+        ZipCodesClient.postZipCodes(newZipCodes);
     }
 
     public static String getRandomNotExistingZipCode() {

@@ -1,10 +1,15 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.BasicResponseHandler;
 import reseponsesDTO.UpdateUserDto;
 import reseponsesDTO.UsersDto;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -14,6 +19,37 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UsersClient {
+    public static ResponseWrapper uploadUsers(File usersFile) {
+        HttpPost httpPost = new HttpPost(PropertiesReader.get("appURI") + PropertiesReader.get("uploadUsersURI"));
+        httpPost.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
+        ResponseWrapper responseWrapper = new ResponseWrapper();
+        CloseableHttpResponse response = null;
+        try {
+            HttpEntity entity = MultipartEntityBuilder.create()
+                    .addBinaryBody("file", usersFile, ContentType.MULTIPART_FORM_DATA, usersFile.getName())
+                    .build();
+            httpPost.setEntity(entity);
+
+            response = HttpClientSingleton.getInstance().getHttpClient().execute(httpPost);
+
+            responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
+            //String uploadUsersResponseBody = Mapper.entityToObj(response.getEntity(), String.class);
+            String responseString = new BasicResponseHandler().handleResponse(response);
+            System.out.println(responseString);
+            responseWrapper.setResponseBody(responseString);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                assert response != null;
+                response.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return responseWrapper;
+    }
+
     public static ResponseWrapper deleteUser(UsersDto usersDto) {
         HttpDeleteWithBody httpDelete = new HttpDeleteWithBody(PropertiesReader.get("appURI") + PropertiesReader.get("usersURI"));
         httpDelete.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
