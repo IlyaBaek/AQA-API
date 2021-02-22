@@ -5,6 +5,7 @@ import reseponsesDTO.UsersDto;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
@@ -12,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UploadUsersTest {
     private Random random = new Random();
+
     @Test
     public void uploadUsersTest() {
         int numberOfUsersToUpload = 4;
@@ -47,7 +49,7 @@ public class UploadUsersTest {
 
         ResponseWrapper usersAfterUpload = UsersClient.getUsers();
         List<String> zipCodesAfterUpload = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
-        assertAll("status code is 201 and users are replaced from users from file",
+        assertAll("status code is 424 and users are not uploaded",
                 () -> assertEquals(424, uploadResponse.getResponseCode()),
                 () -> assertEquals(userListBeforeUpload, usersAfterUpload.getResponseBody()),
                 () -> assertEquals(zipCodesBeforeUpload, zipCodesAfterUpload));
@@ -66,8 +68,31 @@ public class UploadUsersTest {
 
         ResponseWrapper usersAfterUploadResponse = UsersClient.getUsers();
         List<String> zipCodesAfterUpload = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
-        assertAll("status code is 201 and users are replaced from users from file",
+        assertAll("status code is 409 and users are not uploaded",
                 () -> assertEquals(409, uploadResponse.getResponseCode()),
+                () -> assertEquals(userListBeforeUpload, usersAfterUploadResponse.getResponseBody()),
+                () -> assertEquals(zipCodesBeforeUpload, zipCodesAfterUpload));
+    }
+
+    @Test
+    public void uploadUsersWithInvalidFile() {
+        List<UsersDto> userListBeforeUpload = (List<UsersDto>) UsersClient.getUsers().getResponseBody();
+        List<String> zipCodesBeforeUpload = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
+        File invalidFile = new File("./src/main/resources/UploadUsersFile.json");
+        try {
+            FileWriter fileWriter = new FileWriter(invalidFile);
+            fileWriter.write("not a json");
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        ResponseWrapper uploadResponse = UsersClient.uploadUsers(invalidFile);
+
+        ResponseWrapper usersAfterUploadResponse = UsersClient.getUsers();
+        List<String> zipCodesAfterUpload = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
+        assertAll("status code is 400 and users are not uploaded",
+                () -> assertEquals(400, uploadResponse.getResponseCode()),
                 () -> assertEquals(userListBeforeUpload, usersAfterUploadResponse.getResponseBody()),
                 () -> assertEquals(zipCodesBeforeUpload, zipCodesAfterUpload));
     }
