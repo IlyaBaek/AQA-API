@@ -3,7 +3,6 @@ import org.junit.jupiter.api.Test;
 import reseponsesDTO.UpdateUserDto;
 import reseponsesDTO.UsersDto;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
@@ -88,7 +87,7 @@ public class UpdateUserTests {
 
         String updatedZipCode;
         do {
-            ZipCodesClient.createRandomZipCodes();
+            ZipCodesClient.createRandomZipCodes(1);
             List<String> availableZipCodes = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
 
             updatedZipCode =  availableZipCodes.get(random.nextInt(availableZipCodes.size()));

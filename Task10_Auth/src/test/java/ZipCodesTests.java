@@ -18,6 +18,7 @@ public class ZipCodesTests {
         List<String> getZipCodesResponseBody = (List<String>) responseWrapper.getResponseBody();
 
         System.out.println(getZipCodesResponseBody);
+        System.out.println(getZipCodesResponseBody.size());
 
         assertAll("Response has body and status code is 200",
                 () -> assertEquals(200, responseWrapper.getResponseCode(),

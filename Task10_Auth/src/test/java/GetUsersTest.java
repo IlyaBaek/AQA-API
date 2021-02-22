@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class GetUsersTest {
     @BeforeEach
-    public void beforeTest(){
+    public void beforeTest() {
         UsersClient.createUserIfNotExist();
     }
 
@@ -19,8 +19,12 @@ public class GetUsersTest {
     public void getUsers() {
         ResponseWrapper getUsersResponse = UsersClient.getUsers();
         List<UsersDto> usersList = (ArrayList<UsersDto>) getUsersResponse.getResponseBody();
-        for (UsersDto usersDto : usersList) System.out.println(usersDto.getAge());
-
+        for (UsersDto usersDto : usersList) {
+            System.out.println(usersDto.getAge());
+            System.out.println(usersDto.getZipCode());
+            System.out.println(usersDto.getName());
+            System.out.println(usersDto.getUserSex());
+        }
         assertAll("Response has body and status code is 200",
                 () -> assertEquals(200, getUsersResponse.getResponseCode()),
                 () -> assertNotNull(usersList, "Response has body"));
