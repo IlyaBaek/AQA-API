@@ -1,3 +1,4 @@
+import io.qameta.allure.Allure;
 import org.junit.jupiter.api.Test;
 import reseponsesDTO.UsersDto;
 
@@ -22,9 +23,14 @@ public class CreateUsersTests {
 
         ResponseWrapper getZipCodesResponseAfterCreation = ZipCodesClient.getZipCodes();
         List<String> zipCodesListAfterCreation = (List<String>) getZipCodesResponseAfterCreation.getResponseBody();
-        ResponseWrapper getUsersResponse = UsersClient.getUsers();
-        List<UsersDto> usersList = (List<UsersDto>) getUsersResponse.getResponseBody();
+        List<UsersDto> usersList = (List<UsersDto>) UsersClient.getUsers().getResponseBody();
         UsersDto addedUser = usersList.get(usersList.indexOf(userToAdd));
+        Allure.addAttachment("Users after creation", Mapper.UserDtoToString(usersList));
+        Allure.addAttachment("Zip Codes before creation", zipCodesListBeforeCreation.toString());
+        Allure.addAttachment("Zip Codes after creation", zipCodesListAfterCreation.toString());
+        Allure.addAttachment("ZipCodeUsed for creation", exactZipCode);
+        Allure.addAttachment("Expected user to add", Mapper.UserDtoToString(userToAdd));
+        Allure.addAttachment("Added user", Mapper.UserDtoToString(addedUser));
         assertAll("Status code is 201 // user is added, zip code is removed",
                 () -> assertFalse(zipCodesListAfterCreation.contains(exactZipCode), "zipCode should be removed"),
                 () -> assertTrue(usersList.contains(userToAdd), "user should be added"),
@@ -42,6 +48,9 @@ public class CreateUsersTests {
         ResponseWrapper getUsersResponse = UsersClient.getUsers();
         List<UsersDto> usersList = (List<UsersDto>) getUsersResponse.getResponseBody();
         UsersDto addedUser = usersList.get(usersList.indexOf(userToAdd));
+        Allure.addAttachment("Users after creation", Mapper.UserDtoToString(usersList));
+        Allure.addAttachment("Expected user to add", Mapper.UserDtoToString(userToAdd));
+        Allure.addAttachment("Added user", Mapper.UserDtoToString(addedUser));
         assertAll("Status code is 201 // user is added",
                 () -> assertTrue(usersList.contains(userToAdd)),
                 () -> assertEquals(userToAdd, addedUser),
@@ -57,6 +66,8 @@ public class CreateUsersTests {
 
         ResponseWrapper getUsersResponse = UsersClient.getUsers();
         List<UsersDto> usersList = (List<UsersDto>) getUsersResponse.getResponseBody();
+        Allure.addAttachment("Users after creation", Mapper.UserDtoToString(usersList));
+        Allure.addAttachment("Expected user to add", Mapper.UserDtoToString(userToAdd));
         assertAll("Status code is 424 // user is NOT added",
                 () -> assertFalse(usersList.contains(userToAdd)),
                 () -> assertEquals(424, createUserResponse.getResponseCode()));
@@ -73,6 +84,9 @@ public class CreateUsersTests {
 
         ResponseWrapper getUsersResponseAfterAddingDuplicate = UsersClient.getUsers();
         List<UsersDto> usersListAfterAddingDuplicate = (List<UsersDto>) getUsersResponseAfterAddingDuplicate.getResponseBody();
+        Allure.addAttachment("Users list before adding duplicate ", Mapper.UserDtoToString(usersListBeforeAddingDuplicate));
+        Allure.addAttachment("Users list after adding duplicate", Mapper.UserDtoToString(usersListAfterAddingDuplicate));
+        Allure.addAttachment("Expected user to add", Mapper.UserDtoToString(userToAdd));
         assertAll("Status code is 400 // user is NOT added",
                 () -> assertEquals(usersListBeforeAddingDuplicate, usersListAfterAddingDuplicate),
                 () -> assertEquals(400, createUserResponse.getResponseCode()));
@@ -86,6 +100,8 @@ public class CreateUsersTests {
 
         ResponseWrapper getUsersResponse = UsersClient.getUsers();
         List<UsersDto> usersList = (List<UsersDto>) getUsersResponse.getResponseBody();
+        Allure.addAttachment("Users after creation", Mapper.UserDtoToString(usersList));
+        Allure.addAttachment("Expected user to add", Mapper.UserDtoToString(userToAdd));
         assertAll("Status code is 409 // user is NOT added",
                 () -> assertFalse(usersList.contains(userToAdd)),
                 () -> assertEquals(409, createUserResponse.getResponseCode()));

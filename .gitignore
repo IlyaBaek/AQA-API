@@ -16,4 +16,5 @@ target/
 
 allure-report/
 allure-results/
+.allure/
 
