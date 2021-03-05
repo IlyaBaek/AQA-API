@@ -1,4 +1,3 @@
-import io.qameta.allure.Allure;
 import io.qameta.allure.Issue;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,6 @@ public class ZipCodesTests {
         ResponseWrapper responseWrapper = ZipCodesClient.getZipCodes();
         List<String> getZipCodesResponseBody = (List<String>) responseWrapper.getResponseBody();
 
-        Allure.addAttachment("Zip Codes", getZipCodesResponseBody.toString());
         assertAll("Response has body and status code is 200",
                 () -> assertEquals(200, responseWrapper.getResponseCode(),
                         "Bug: GET request should return 200"),
@@ -41,10 +39,6 @@ public class ZipCodesTests {
 
         ResponseWrapper responsePost = ZipCodesClient.postZipCodes(newZipCodes);
         List<String> resultZipCodes = (List<String>) responsePost.getResponseBody();
-
-        Allure.addAttachment("Zip Codes before creation", availableZipCodes.toString());
-        Allure.addAttachment("Expected Zip Codes", expectedZipCodesAfterPost.toString());
-        Allure.addAttachment("Zip Codes after creation", resultZipCodes.toString());
         assertAll("Status code is 201 and Zip codes from request body are added to available zip codes",
                 () -> assertEquals(expectedZipCodesAfterPost, resultZipCodes),
                 () -> assertEquals(201, responsePost.getResponseCode()));
@@ -68,11 +62,6 @@ public class ZipCodesTests {
         ResponseWrapper responsePost = ZipCodesClient.postZipCodes(newZipCodes);
         List<String> resultZipCodes = (List<String>) responsePost.getResponseBody();
         List<String> resultZipCodesWithoutDuplications = new ArrayList<>(new HashSet<>(resultZipCodes));
-
-        Allure.addAttachment("Zip Codes before creation", availableZipCodes.toString());
-        Allure.addAttachment("Expected Zip Codes", expectedZipCodesAfterPost.toString());
-        Allure.addAttachment("Zip Codes after creation", resultZipCodes.toString());
-        Allure.addAttachment("Result Zip Codes without duplication", resultZipCodesWithoutDuplications.toString());
         assertAll("Status code is 201 // Zip codes from request body are added to available zip codes //  There are no duplications in available zip codes",
                 () -> assertEquals(expectedZipCodesAfterPost, resultZipCodes),
                 () -> assertEquals(resultZipCodesWithoutDuplications, resultZipCodes),
@@ -104,10 +93,6 @@ public class ZipCodesTests {
                 .collect(Collectors.toList());
         allZipCodes.addAll(zipCodesAfterAdding);
         List<String> allZipCodesWithoutDuplications = new ArrayList<>(new HashSet<>(allZipCodes));
-        Allure.addAttachment("Zip Codes before creation", availableZipCodes.toString());
-        Allure.addAttachment("Expected Zip Codes", expectedZipCodesAfterPost.toString());
-        Allure.addAttachment("all Zip Codes", allZipCodes.toString());
-        Allure.addAttachment("All Zip Codes without duplication", allZipCodesWithoutDuplications.toString());
         assertAll("Status 201 // Zip codes added // There is no duplication between used and not used zipCodes",
                 () -> assertEquals(expectedZipCodesAfterPost, zipCodesAfterAdding),
                 () -> assertEquals(allZipCodesWithoutDuplications, allZipCodes),

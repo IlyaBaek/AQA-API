@@ -1,3 +1,5 @@
+import io.qameta.allure.Allure;
+import io.qameta.allure.Step;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -11,6 +13,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ZipCodesClient {
+    @Step("GET zip codes")
     public static ResponseWrapper getZipCodes() {
         HttpGet httpGet = new HttpGet(PropertiesReader.get("appURI") + PropertiesReader.get("zipCodesURI"));
         httpGet.addHeader("Authorization", AuthSingleton.getInstance().getReadToken());
@@ -22,6 +25,7 @@ public class ZipCodesClient {
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
             List<String> zipCodesResponseBody = Stream.of(Mapper.entityToObj(response.getEntity(), String[].class)).collect(Collectors.toCollection(ArrayList::new));
             responseWrapper.setResponseBody(zipCodesResponseBody);
+            Allure.addAttachment("Zip Codes:", zipCodesResponseBody.toString());
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -35,6 +39,7 @@ public class ZipCodesClient {
         return responseWrapper;
     }
 
+    @Step("POST zip codes")
     public static ResponseWrapper postZipCodes(List<String> body) {
         HttpPost httpPost = new HttpPost(PropertiesReader.get("appURI") + PropertiesReader.get("zipCodesExpandURI"));
         httpPost.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
@@ -50,6 +55,7 @@ public class ZipCodesClient {
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
             List<String> zipCodesResponseBody = Stream.of(Mapper.entityToObj(response.getEntity(), String[].class)).collect(Collectors.toCollection(ArrayList::new));
             responseWrapper.setResponseBody(zipCodesResponseBody);
+            Allure.addAttachment("Created zip Codes:", zipCodesResponseBody.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -1,4 +1,3 @@
-import io.qameta.allure.Allure;
 import io.qameta.allure.Step;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,6 @@ public class UpdateUserTests {
 
         List<String> zipCodesAfterCreation = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
         List<UsersDto> usersAfterUpdate = (List<UsersDto>) UsersClient.getUsers().getResponseBody();
-        addAllureAttachment(updateUserDto, zipCodesAfterCreation, usersAfterUpdate);
         assertAll("status code is 200 and user is updated",
                 () -> assertEquals(200, updateUserResponse.getResponseCode()),
                 () -> assertTrue(usersAfterUpdate.contains(updateUserDto.getUserNewValues()), "Updated user exist"),
@@ -45,7 +43,6 @@ public class UpdateUserTests {
 
         List<String> zipCodesAfterCreation = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
         List<UsersDto> usersAfterUpdate = (List<UsersDto>) UsersClient.getUsers().getResponseBody();
-        addAllureAttachment(updateUserDto, zipCodesAfterCreation, usersAfterUpdate);
         assertAll("status code is 424 and user is not updated",
                 () -> assertEquals(424, updateUserResponse.getResponseCode()),
                 () -> assertFalse(usersAfterUpdate.contains(updateUserDto.getUserNewValues()), "userNewValues doesn't exist in users list"),
@@ -62,7 +59,6 @@ public class UpdateUserTests {
 
         List<String> zipCodesAfterCreation = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
         List<UsersDto> usersAfterUpdate = (List<UsersDto>) UsersClient.getUsers().getResponseBody();
-        addAllureAttachment(updateUserDto, zipCodesAfterCreation, usersAfterUpdate);
         assertAll("status code is 409 and user is not updated",
                 () -> assertEquals(409, updateUserResponse.getResponseCode()),
                 () -> assertFalse(usersAfterUpdate.contains(updateUserDto.getUserNewValues()), "UserNewValues doesn't exist in users list"),
@@ -79,7 +75,6 @@ public class UpdateUserTests {
 
         List<String> zipCodesAfterCreation = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
         List<UsersDto> usersAfterUpdate = (List<UsersDto>) UsersClient.getUsers().getResponseBody();
-        addAllureAttachment(updateUserDto, zipCodesAfterCreation, usersAfterUpdate);
         assertAll("status code is 409 and user is not updated",
                 () -> assertEquals(400, updateUserResponse.getResponseCode()),
                 () -> assertFalse(usersAfterUpdate.contains(updateUserDto.getUserNewValues()), "UserNewValues doesn't exist in the system"),
@@ -137,12 +132,5 @@ public class UpdateUserTests {
                 break;
         }
         return new UpdateUserDto(userNewValues, userToChange);
-    }
-
-    private void addAllureAttachment(UpdateUserDto updateUserDto, List<String> zipCodesAfterCreation, List<UsersDto> usersAfterUpdate) {
-        Allure.addAttachment("Users after creation", Mapper.UserDtoToString(usersAfterUpdate));
-        Allure.addAttachment("Zip Codes after creation", zipCodesAfterCreation.toString());
-        Allure.addAttachment("User New Values", Mapper.UserDtoToString(updateUserDto.getUserNewValues()));
-        Allure.addAttachment("User To Change", Mapper.UserDtoToString(updateUserDto.getUserToChange()));
     }
 }

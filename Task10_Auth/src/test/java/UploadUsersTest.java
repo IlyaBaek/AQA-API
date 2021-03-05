@@ -1,9 +1,6 @@
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.qameta.allure.Allure;
-import io.qameta.allure.Step;
 import org.junit.jupiter.api.Test;
-import reseponsesDTO.UpdateUserDto;
 import reseponsesDTO.UsersDto;
 
 import java.io.File;
@@ -33,7 +30,6 @@ public class UploadUsersTest {
         List<UsersDto> usersAfterUpload = (List<UsersDto>) usersAfterUploadResponse.getResponseBody();
         List<String> zipCodesAfterUpload = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
         int numberOfUsersUploaded = Integer.parseInt(uploadResponse.getResponseBody().toString().replaceAll("[^0-9]", ""));
-        addAllureAttachment(null, null, zipCodesAfterUpload, usersAfterUpload, usersToUpload);
         assertAll("status code is 201 and users are replaced from users from file",
                 () -> assertEquals(201, uploadResponse.getResponseCode()),
                 () -> assertEquals(usersAfterUpload, usersToUpload),
@@ -55,7 +51,6 @@ public class UploadUsersTest {
         ResponseWrapper usersAfterUploadResponse = UsersClient.getUsers();
         List<UsersDto> usersAfterUpload = (List<UsersDto>) usersAfterUploadResponse.getResponseBody();
         List<String> zipCodesAfterUpload = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
-        addAllureAttachment(zipCodesBeforeUpload, userListBeforeUpload, zipCodesAfterUpload, usersAfterUpload, usersToUpload);
         assertAll("status code is 424 and users are not uploaded",
                 () -> assertEquals(424, uploadResponse.getResponseCode()),
                 () -> assertEquals(userListBeforeUpload, usersAfterUpload),
@@ -76,7 +71,6 @@ public class UploadUsersTest {
         ResponseWrapper usersAfterUploadResponse = UsersClient.getUsers();
         List<String> zipCodesAfterUpload = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
         List<UsersDto> usersAfterUpload = (List<UsersDto>) usersAfterUploadResponse.getResponseBody();
-        addAllureAttachment(zipCodesBeforeUpload, userListBeforeUpload, zipCodesAfterUpload, usersAfterUpload, usersToUpload);
         assertAll("status code is 409 and users are not uploaded",
                 () -> assertEquals(409, uploadResponse.getResponseCode()),
                 () -> assertEquals(userListBeforeUpload, usersAfterUpload),
@@ -101,14 +95,12 @@ public class UploadUsersTest {
         ResponseWrapper usersAfterUploadResponse = UsersClient.getUsers();
         List<String> zipCodesAfterUpload = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
         List<UsersDto> usersAfterUpload = (List<UsersDto>) usersAfterUploadResponse.getResponseBody();
-        addAllureAttachment(zipCodesBeforeUpload, userListBeforeUpload, zipCodesAfterUpload, usersAfterUpload, null);
         assertAll("status code is 400 and users are not uploaded",
                 () -> assertEquals(400, uploadResponse.getResponseCode()),
                 () -> assertEquals(userListBeforeUpload, usersAfterUpload),
                 () -> assertEquals(zipCodesBeforeUpload, zipCodesAfterUpload));
     }
 
-    @Step("Prepare list of users for upload")
     private List<UsersDto> getUsersListToUpload(int usersCount) {
         ZipCodesClient.createRandomZipCodes(usersCount);
         List<String> zipCodes = new ArrayList<>(new HashSet<>((List<String>) ZipCodesClient.getZipCodes().getResponseBody()));
@@ -121,7 +113,6 @@ public class UploadUsersTest {
         return usersToUploadList;
     }
 
-    @Step("File with users")
     private File getFileWithListOfUsers(List<UsersDto> usersToUpload) {
         ObjectMapper objectMapper = new ObjectMapper();
         File myFile = new File("./src/main/resources/UploadUsersFile.json");
@@ -138,13 +129,5 @@ public class UploadUsersTest {
             e.printStackTrace();
         }
         return myFile;
-    }
-
-    private void addAllureAttachment(List<String> zipCodesBeforeCreation, List<UsersDto> usersBeforeUpdate, List<String> zipCodesAfterCreation, List<UsersDto> usersAfterUpdate, List<UsersDto> usersToUpload) {
-        Allure.addAttachment("Users before creation", Mapper.UserDtoToString(usersBeforeUpdate));
-        Allure.addAttachment("Zip Codes before creation", zipCodesBeforeCreation.toString());
-        Allure.addAttachment("Users after creation", Mapper.UserDtoToString(usersAfterUpdate));
-        Allure.addAttachment("Zip Codes after creation", zipCodesAfterCreation.toString());
-        Allure.addAttachment("Users to upload", Mapper.UserDtoToString(usersToUpload));
     }
 }

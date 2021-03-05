@@ -1,4 +1,6 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.qameta.allure.Allure;
+import io.qameta.allure.Step;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.*;
 import org.apache.http.client.utils.URIBuilder;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UsersClient {
+    @Step("POST upload users")
     public static ResponseWrapper uploadUsers(File usersFile) {
         HttpPost httpPost = new HttpPost(PropertiesReader.get("appURI") + PropertiesReader.get("uploadUsersURI"));
         httpPost.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
@@ -35,8 +38,8 @@ public class UsersClient {
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
             //String uploadUsersResponseBody = Mapper.entityToObj(response.getEntity(), String.class);
             String responseString = new BasicResponseHandler().handleResponse(response);
-            System.out.println(responseString);
             responseWrapper.setResponseBody(responseString);
+            Allure.addAttachment("Number of uploaded users", responseString);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -50,6 +53,7 @@ public class UsersClient {
         return responseWrapper;
     }
 
+    @Step("POST delete user")
     public static ResponseWrapper deleteUser(UsersDto usersDto) {
         HttpDeleteWithBody httpDelete = new HttpDeleteWithBody(PropertiesReader.get("appURI") + PropertiesReader.get("usersURI"));
         httpDelete.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
@@ -65,8 +69,8 @@ public class UsersClient {
 
             response = HttpClientSingleton.getInstance().getHttpClient().execute(httpDelete);
 
-
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
+            Allure.addAttachment("User to remove", Mapper.UserDtoToString(usersDto));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -80,6 +84,7 @@ public class UsersClient {
         return responseWrapper;
     }
 
+    @Step("PUT update user")
     public static ResponseWrapper updateUser(UpdateUserDto updatedUserInfo) {
         ResponseWrapper responseWrapper = new ResponseWrapper();
         CloseableHttpResponse response = null;
@@ -106,6 +111,8 @@ public class UsersClient {
             }
             assert response != null;
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
+            Allure.addAttachment("User to update", Mapper.UserDtoToString(updatedUserInfo.getUserToChange()));
+            Allure.addAttachment("User new values", Mapper.UserDtoToString(updatedUserInfo.getUserNewValues()));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -119,6 +126,7 @@ public class UsersClient {
         return responseWrapper;
     }
 
+    @Step("POST create user")
     public static ResponseWrapper createUser(UsersDto usersDto) {
         HttpPost httpPost = new HttpPost(PropertiesReader.get("appURI") + PropertiesReader.get("usersURI"));
         httpPost.addHeader("Authorization", AuthSingleton.getInstance().getWriteToken());
@@ -137,6 +145,7 @@ public class UsersClient {
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
             //responseWrapper.setResponseBodyUsers(Mapper.entityToObj(response.getEntity(),UsersDto.class););
             //NOT APPLICABLE BECAUSE OF THE BUG(POST users doesn't return body of created user)
+            Allure.addAttachment("Created user", Mapper.UserDtoToString(usersDto));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -154,6 +163,7 @@ public class UsersClient {
         return getUsers(null, null, null);
     }
 
+    @Step("GET users with parameters")
     public static ResponseWrapper getUsers(Integer olderThan, Integer youngerThan, UsersDto.Sex sex) {
         URIBuilder builder;
         HttpGet httpGet = null;
@@ -181,6 +191,7 @@ public class UsersClient {
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
             List<UsersDto> usersResponseBody = Stream.of(Mapper.entityToObj(response.getEntity(), UsersDto[].class)).collect(Collectors.toCollection(ArrayList::new));
             responseWrapper.setResponseBody(usersResponseBody);
+            Allure.addAttachment("Users", Mapper.UserDtoToString(usersResponseBody));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
