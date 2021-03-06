@@ -20,4 +20,16 @@ public class Mapper {
             throw new RuntimeException("Can't map to the object of " + clazz.getName());
         }
     }
+
+    public static String userDtoToString(Object users) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        String usersString = null;
+        try {
+            usersString = objectMapper.writeValueAsString(users);
+
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return usersString;
+    }
 }

@@ -22,8 +22,7 @@ public class CreateUsersTests {
 
         ResponseWrapper getZipCodesResponseAfterCreation = ZipCodesClient.getZipCodes();
         List<String> zipCodesListAfterCreation = (List<String>) getZipCodesResponseAfterCreation.getResponseBody();
-        ResponseWrapper getUsersResponse = UsersClient.getUsers();
-        List<UsersDto> usersList = (List<UsersDto>) getUsersResponse.getResponseBody();
+        List<UsersDto> usersList = (List<UsersDto>) UsersClient.getUsers().getResponseBody();
         UsersDto addedUser = usersList.get(usersList.indexOf(userToAdd));
         assertAll("Status code is 201 // user is added, zip code is removed",
                 () -> assertFalse(zipCodesListAfterCreation.contains(exactZipCode), "zipCode should be removed"),

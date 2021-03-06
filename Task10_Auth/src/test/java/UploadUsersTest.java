@@ -26,12 +26,13 @@ public class UploadUsersTest {
 
         ResponseWrapper uploadResponse = UsersClient.uploadUsers(getFileWithListOfUsers(usersToUpload));
 
-        ResponseWrapper usersAfterUpload = UsersClient.getUsers();
+        ResponseWrapper usersAfterUploadResponse = UsersClient.getUsers();
+        List<UsersDto> usersAfterUpload = (List<UsersDto>) usersAfterUploadResponse.getResponseBody();
         List<String> zipCodesAfterUpload = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
         int numberOfUsersUploaded = Integer.parseInt(uploadResponse.getResponseBody().toString().replaceAll("[^0-9]", ""));
         assertAll("status code is 201 and users are replaced from users from file",
                 () -> assertEquals(201, uploadResponse.getResponseCode()),
-                () -> assertEquals(usersAfterUpload.getResponseBody(), usersToUpload),
+                () -> assertEquals(usersAfterUpload, usersToUpload),
                 () -> assertEquals(numberOfUsersToUpload, numberOfUsersUploaded),
                 () -> assertTrue(zipCodesAfterUpload.containsAll(zipCodesListOfUsersBeforeUpload), "At least one of replaced users zip code is not returned to the list of available zip codes"),
                 () -> assertTrue(Collections.disjoint(zipCodesAfterUpload, zipCodesListOfUsersToUpload), "Uploaded users zip codes are not removed from the list of available zip codes"));
@@ -47,11 +48,12 @@ public class UploadUsersTest {
 
         ResponseWrapper uploadResponse = UsersClient.uploadUsers(getFileWithListOfUsers(usersToUpload));
 
-        ResponseWrapper usersAfterUpload = UsersClient.getUsers();
+        ResponseWrapper usersAfterUploadResponse = UsersClient.getUsers();
+        List<UsersDto> usersAfterUpload = (List<UsersDto>) usersAfterUploadResponse.getResponseBody();
         List<String> zipCodesAfterUpload = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
         assertAll("status code is 424 and users are not uploaded",
                 () -> assertEquals(424, uploadResponse.getResponseCode()),
-                () -> assertEquals(userListBeforeUpload, usersAfterUpload.getResponseBody()),
+                () -> assertEquals(userListBeforeUpload, usersAfterUpload),
                 () -> assertEquals(zipCodesBeforeUpload, zipCodesAfterUpload));
     }
 
@@ -68,9 +70,10 @@ public class UploadUsersTest {
 
         ResponseWrapper usersAfterUploadResponse = UsersClient.getUsers();
         List<String> zipCodesAfterUpload = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
+        List<UsersDto> usersAfterUpload = (List<UsersDto>) usersAfterUploadResponse.getResponseBody();
         assertAll("status code is 409 and users are not uploaded",
                 () -> assertEquals(409, uploadResponse.getResponseCode()),
-                () -> assertEquals(userListBeforeUpload, usersAfterUploadResponse.getResponseBody()),
+                () -> assertEquals(userListBeforeUpload, usersAfterUpload),
                 () -> assertEquals(zipCodesBeforeUpload, zipCodesAfterUpload));
     }
 
@@ -91,9 +94,10 @@ public class UploadUsersTest {
 
         ResponseWrapper usersAfterUploadResponse = UsersClient.getUsers();
         List<String> zipCodesAfterUpload = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
+        List<UsersDto> usersAfterUpload = (List<UsersDto>) usersAfterUploadResponse.getResponseBody();
         assertAll("status code is 400 and users are not uploaded",
                 () -> assertEquals(400, uploadResponse.getResponseCode()),
-                () -> assertEquals(userListBeforeUpload, usersAfterUploadResponse.getResponseBody()),
+                () -> assertEquals(userListBeforeUpload, usersAfterUpload),
                 () -> assertEquals(zipCodesBeforeUpload, zipCodesAfterUpload));
     }
 

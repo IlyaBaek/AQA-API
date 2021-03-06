@@ -1,3 +1,4 @@
+import io.qameta.allure.Issue;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Test;
 import reseponsesDTO.UsersDto;
@@ -13,12 +14,10 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ZipCodesTests {
 
     @Test
+    @Issue("Bug: GET request should return 200 instead of 201")
     public void getZipCodesTest() {
         ResponseWrapper responseWrapper = ZipCodesClient.getZipCodes();
         List<String> getZipCodesResponseBody = (List<String>) responseWrapper.getResponseBody();
-
-        System.out.println(getZipCodesResponseBody);
-        System.out.println(getZipCodesResponseBody.size());
 
         assertAll("Response has body and status code is 200",
                 () -> assertEquals(200, responseWrapper.getResponseCode(),
@@ -28,8 +27,7 @@ public class ZipCodesTests {
 
     @Test
     public void addZipCodesTest() {
-        ResponseWrapper responseGet = ZipCodesClient.getZipCodes();
-        List<String> availableZipCodes = (List<String>) responseGet.getResponseBody();
+        List<String> availableZipCodes = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
 
         List<String> newZipCodes = new ArrayList<>();
         newZipCodes.add(RandomStringUtils.random(5, false, true));
@@ -41,7 +39,6 @@ public class ZipCodesTests {
 
         ResponseWrapper responsePost = ZipCodesClient.postZipCodes(newZipCodes);
         List<String> resultZipCodes = (List<String>) responsePost.getResponseBody();
-
         assertAll("Status code is 201 and Zip codes from request body are added to available zip codes",
                 () -> assertEquals(expectedZipCodesAfterPost, resultZipCodes),
                 () -> assertEquals(201, responsePost.getResponseCode()));
@@ -65,7 +62,6 @@ public class ZipCodesTests {
         ResponseWrapper responsePost = ZipCodesClient.postZipCodes(newZipCodes);
         List<String> resultZipCodes = (List<String>) responsePost.getResponseBody();
         List<String> resultZipCodesWithoutDuplications = new ArrayList<>(new HashSet<>(resultZipCodes));
-
         assertAll("Status code is 201 // Zip codes from request body are added to available zip codes //  There are no duplications in available zip codes",
                 () -> assertEquals(expectedZipCodesAfterPost, resultZipCodes),
                 () -> assertEquals(resultZipCodesWithoutDuplications, resultZipCodes),

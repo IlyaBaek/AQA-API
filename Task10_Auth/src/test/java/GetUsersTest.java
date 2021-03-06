@@ -19,12 +19,7 @@ public class GetUsersTest {
     public void getUsers() {
         ResponseWrapper getUsersResponse = UsersClient.getUsers();
         List<UsersDto> usersList = (ArrayList<UsersDto>) getUsersResponse.getResponseBody();
-        for (UsersDto usersDto : usersList) {
-            System.out.println(usersDto.getAge());
-            System.out.println(usersDto.getZipCode());
-            System.out.println(usersDto.getName());
-            System.out.println(usersDto.getUserSex());
-        }
+
         assertAll("Response has body and status code is 200",
                 () -> assertEquals(200, getUsersResponse.getResponseCode()),
                 () -> assertNotNull(usersList, "Response has body"));
@@ -66,7 +61,6 @@ public class GetUsersTest {
         ResponseWrapper getUsersResponse = UsersClient.getUsers();
         List<UsersDto> usersList = (ArrayList<UsersDto>) getUsersResponse.getResponseBody();
         List<UsersDto> filteredUserList = usersList.stream().filter(x -> x.getUserSex() == sex).collect(Collectors.toCollection(ArrayList::new));
-
         ResponseWrapper getUsersBySexResponse = UsersClient.getUsers(null, null, sex);
 
         List<UsersDto> resultUserList = (ArrayList<UsersDto>) getUsersBySexResponse.getResponseBody();
