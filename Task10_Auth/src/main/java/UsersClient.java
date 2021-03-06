@@ -70,7 +70,7 @@ public class UsersClient {
             response = HttpClientSingleton.getInstance().getHttpClient().execute(httpDelete);
 
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
-            Allure.addAttachment("User to remove", Mapper.UserDtoToString(usersDto));
+            Allure.addAttachment("User to remove", Mapper.userDtoToString(usersDto));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -111,8 +111,8 @@ public class UsersClient {
             }
             assert response != null;
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
-            Allure.addAttachment("User to update", Mapper.UserDtoToString(updatedUserInfo.getUserToChange()));
-            Allure.addAttachment("User new values", Mapper.UserDtoToString(updatedUserInfo.getUserNewValues()));
+            Allure.addAttachment("User to update", Mapper.userDtoToString(updatedUserInfo.getUserToChange()));
+            Allure.addAttachment("User new values", Mapper.userDtoToString(updatedUserInfo.getUserNewValues()));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -145,7 +145,7 @@ public class UsersClient {
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
             //responseWrapper.setResponseBodyUsers(Mapper.entityToObj(response.getEntity(),UsersDto.class););
             //NOT APPLICABLE BECAUSE OF THE BUG(POST users doesn't return body of created user)
-            Allure.addAttachment("Created user", Mapper.UserDtoToString(usersDto));
+            Allure.addAttachment("Created user", Mapper.userDtoToString(usersDto));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -191,7 +191,7 @@ public class UsersClient {
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
             List<UsersDto> usersResponseBody = Stream.of(Mapper.entityToObj(response.getEntity(), UsersDto[].class)).collect(Collectors.toCollection(ArrayList::new));
             responseWrapper.setResponseBody(usersResponseBody);
-            Allure.addAttachment("Users", Mapper.UserDtoToString(usersResponseBody));
+            Allure.addAttachment("Users", Mapper.userDtoToString(usersResponseBody));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

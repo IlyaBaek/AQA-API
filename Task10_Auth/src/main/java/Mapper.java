@@ -21,7 +21,7 @@ public class Mapper {
         }
     }
 
-    public static String UserDtoToString(Object users) {
+    public static String userDtoToString(Object users) {
         ObjectMapper objectMapper = new ObjectMapper();
         String usersString = null;
         try {
