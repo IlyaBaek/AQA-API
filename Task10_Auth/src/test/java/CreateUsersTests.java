@@ -45,6 +45,7 @@ public class CreateUsersTests {
                 () -> assertTrue(usersList.contains(userToAdd)),
                 () -> assertEquals(userToAdd, addedUser),
                 () -> assertEquals(201, createUserResponse.getResponseCode()));
+        UsersClient.deleteUser(addedUser);
     }
 
     @Test
@@ -63,6 +64,7 @@ public class CreateUsersTests {
 
     @Test
     public void createUserWithDuplicateNameAndSexTest() {
+        UsersClient.createUserIfNotExist();
         ResponseWrapper getUsersBeforeAddingDuplicateResponse = UsersClient.getUsers();
         List<UsersDto> usersListBeforeAddingDuplicate = (List<UsersDto>) getUsersBeforeAddingDuplicateResponse.getResponseBody();
         UsersDto userWithDuplicateNameAndSex = usersListBeforeAddingDuplicate.get(random.nextInt(usersListBeforeAddingDuplicate.size()));
