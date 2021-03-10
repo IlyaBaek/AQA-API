@@ -76,7 +76,7 @@ public class UpdateUserTests {
         List<String> zipCodesAfterCreation = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
         List<UsersDto> usersAfterUpdate = (List<UsersDto>) UsersClient.getUsers().getResponseBody();
         assertAll("status code is 409 and user is not updated",
-                () -> assertEquals(400, updateUserResponse.getResponseCode()),
+                () -> assertEquals(409, updateUserResponse.getResponseCode()),
                 () -> assertFalse(usersAfterUpdate.contains(updateUserDto.getUserNewValues()), "UserNewValues doesn't exist in the system"),
                 () -> assertFalse(zipCodesAfterCreation.contains(updateUserDto.getUserToChange().getZipCode()), "User old zip code is NOT added to the list of available zip codes"),
                 () -> assertTrue(zipCodesAfterCreation.contains(updateUserDto.getUserNewValues().getZipCode()), "user new zip code is NOT removed from available zip codes list"));
@@ -95,7 +95,6 @@ public class UpdateUserTests {
             updatedZipCode = availableZipCodes.get(random.nextInt(availableZipCodes.size()));
         }
         while (Objects.equals(updatedZipCode, userToChange.getZipCode()));
-
 
         UsersDto userNewValues = new UsersDto();
         switch (choice) {

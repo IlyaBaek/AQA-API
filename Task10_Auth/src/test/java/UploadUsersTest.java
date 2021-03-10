@@ -51,6 +51,8 @@ public class UploadUsersTest {
         ResponseWrapper usersAfterUploadResponse = UsersClient.getUsers();
         List<UsersDto> usersAfterUpload = (List<UsersDto>) usersAfterUploadResponse.getResponseBody();
         List<String> zipCodesAfterUpload = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
+        Collections.sort(zipCodesAfterUpload);
+        Collections.sort(zipCodesBeforeUpload);
         assertAll("status code is 424 and users are not uploaded",
                 () -> assertEquals(424, uploadResponse.getResponseCode()),
                 () -> assertEquals(userListBeforeUpload, usersAfterUpload),
@@ -71,6 +73,8 @@ public class UploadUsersTest {
         ResponseWrapper usersAfterUploadResponse = UsersClient.getUsers();
         List<String> zipCodesAfterUpload = (List<String>) ZipCodesClient.getZipCodes().getResponseBody();
         List<UsersDto> usersAfterUpload = (List<UsersDto>) usersAfterUploadResponse.getResponseBody();
+        Collections.sort(zipCodesAfterUpload);
+        Collections.sort(zipCodesBeforeUpload);
         assertAll("status code is 409 and users are not uploaded",
                 () -> assertEquals(409, uploadResponse.getResponseCode()),
                 () -> assertEquals(userListBeforeUpload, usersAfterUpload),

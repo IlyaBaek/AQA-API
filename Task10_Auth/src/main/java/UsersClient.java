@@ -36,10 +36,11 @@ public class UsersClient {
             response = HttpClientSingleton.getInstance().getHttpClient().execute(httpPost);
 
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
+            Allure.addAttachment("status Code", response.getStatusLine().getStatusCode() + "qwe");
             //String uploadUsersResponseBody = Mapper.entityToObj(response.getEntity(), String.class);
             String responseString = new BasicResponseHandler().handleResponse(response);
             responseWrapper.setResponseBody(responseString);
-            Allure.addAttachment("Number of uploaded users", responseString);
+            Allure.addAttachment("Number of uploaded users:", responseString + "zxc");
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -70,7 +71,7 @@ public class UsersClient {
             response = HttpClientSingleton.getInstance().getHttpClient().execute(httpDelete);
 
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
-            Allure.addAttachment("User to remove", Mapper.userDtoToString(usersDto));
+            Allure.addAttachment("User to remove", response.getStatusLine().getStatusCode() + "\n" + Mapper.userDtoToString(usersDto));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -111,8 +112,8 @@ public class UsersClient {
             }
             assert response != null;
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
-            Allure.addAttachment("User to update", Mapper.userDtoToString(updatedUserInfo.getUserToChange()));
-            Allure.addAttachment("User new values", Mapper.userDtoToString(updatedUserInfo.getUserNewValues()));
+            Allure.addAttachment("User to update", response.getStatusLine().getStatusCode() + "\n" + Mapper.userDtoToString(updatedUserInfo.getUserToChange()));
+            Allure.addAttachment("User new values", response.getStatusLine().getStatusCode() + "\n" + Mapper.userDtoToString(updatedUserInfo.getUserNewValues()));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -145,7 +146,7 @@ public class UsersClient {
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
             //responseWrapper.setResponseBodyUsers(Mapper.entityToObj(response.getEntity(),UsersDto.class););
             //NOT APPLICABLE BECAUSE OF THE BUG(POST users doesn't return body of created user)
-            Allure.addAttachment("Created user", Mapper.userDtoToString(usersDto));
+            Allure.addAttachment("Created user", response.getStatusLine().getStatusCode() + "\n" + Mapper.userDtoToString(usersDto));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -191,7 +192,7 @@ public class UsersClient {
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
             List<UsersDto> usersResponseBody = Stream.of(Mapper.entityToObj(response.getEntity(), UsersDto[].class)).collect(Collectors.toCollection(ArrayList::new));
             responseWrapper.setResponseBody(usersResponseBody);
-            Allure.addAttachment("Users", Mapper.userDtoToString(usersResponseBody));
+            Allure.addAttachment("Users", response.getStatusLine().getStatusCode() + "\n" + Mapper.userDtoToString(usersResponseBody));
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

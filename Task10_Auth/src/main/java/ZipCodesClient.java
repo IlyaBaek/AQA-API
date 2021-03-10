@@ -25,7 +25,7 @@ public class ZipCodesClient {
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
             List<String> zipCodesResponseBody = Stream.of(Mapper.entityToObj(response.getEntity(), String[].class)).collect(Collectors.toCollection(ArrayList::new));
             responseWrapper.setResponseBody(zipCodesResponseBody);
-            Allure.addAttachment("Zip Codes:", zipCodesResponseBody.toString());
+            Allure.addAttachment("Zip Codes:", response.getStatusLine().getStatusCode() + "\n" + zipCodesResponseBody.toString());
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -46,7 +46,7 @@ public class ZipCodesClient {
         ResponseWrapper responseWrapper = new ResponseWrapper();
         CloseableHttpResponse response = null;
         try {
-            StringEntity entity = new StringEntity(body.toString());
+            StringEntity entity = new StringEntity(Mapper.userDtoToString(body));
             httpPost.setEntity(entity);
             httpPost.setHeader("Accept", "*/*");
             httpPost.setHeader("Content-type", "application/json");
@@ -55,7 +55,7 @@ public class ZipCodesClient {
             responseWrapper.setResponseCode(response.getStatusLine().getStatusCode());
             List<String> zipCodesResponseBody = Stream.of(Mapper.entityToObj(response.getEntity(), String[].class)).collect(Collectors.toCollection(ArrayList::new));
             responseWrapper.setResponseBody(zipCodesResponseBody);
-            Allure.addAttachment("Created zip Codes:", zipCodesResponseBody.toString());
+            Allure.addAttachment("Created zip Codes:", response.getStatusLine().getStatusCode() + "\n" + zipCodesResponseBody.toString());
         } catch (IOException e) {
             e.printStackTrace();
         }
